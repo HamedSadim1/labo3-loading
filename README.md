@@ -1,46 +1,77 @@
-# Getting Started with Create React App
+# Labo 3 - Loading App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Een moderne React-applicatie gebouwd met Vite, die een elegante loading-ervaring demonstreert met glassmorphism effecten. Dit project is ontwikkeld als onderdeel van het Webframeworks labo aan de AP Hogeschool.
 
-## Available Scripts
+## ✨ Features
 
-In the project directory, you can run:
+- **Moderne UI**: Gebruikt Tailwind CSS voor styling met glassmorphism effecten (transparante achtergronden, blur-effecten en schaduwen).
+- **Snelle Development**: Gebouwd met Vite voor razendsnelle hot module replacement en builds.
+- **Responsive Design**: Werkt naadloos op desktop en mobiele apparaten.
+- **TypeScript**: Volledig getypt voor betere ontwikkelaarervaring en foutpreventie.
+- **Modulaire Structuur**: Georganiseerd volgens DRY-principes met gescheiden componenten, utilities en constants.
 
-### `npm start`
+## 🛠️ Tech Stack
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+- **Frontend Framework**: React 19
+- **Build Tool**: Vite
+- **Styling**: Tailwind CSS v4
+- **Language**: TypeScript
+- **Loading Component**: React Loader Spinner
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## 🚀 Installatie
 
-### `npm test`
+1. **Clone de repository**:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+   ```bash
+   git clone https://github.com/HamedSadim1/labo3-loading.git
+   cd labo3-loading
+   ```
 
-### `npm run build`
+2. **Installeer dependencies**:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+   ```bash
+   npm install
+   ```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+3. **Start de development server**:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+   ```bash
+   npm run dev
+   ```
 
-### `npm run eject`
+   Open [http://localhost:5173](http://localhost:5173) in je browser.
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+## 📖 Gebruik
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+De app toont een centraal paneel met een "Start Loading" knop. Klik op de knop om een 3-seconden durende loading animatie te starten met een elegante spinner en glassmorphism styling.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+## 📜 Scripts
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+- `npm run dev`: Start de development server
+- `npm run build`: Bouw de app voor productie
+- `npm run preview`: Preview de productie build lokaal
 
-## Learn More
+## 📁 Project Structuur
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```text
+src/
+├── components/          # React componenten
+│   ├── Background.tsx   # Achtergrond component
+│   ├── GlassCard.tsx    # Glazen paneel component
+│   ├── Header.tsx       # Titel component
+│   └── Loading.tsx      # Loading logica en UI
+├── constants/           # Constante waarden
+│   └── app.ts           # App-specifieke constants
+├── svg/                 # SVG assets
+│   └── spinner.svg      # Voorbeeld spinner SVG
+└── utils/               # Helper functies
+    └── delay.ts         # Delay utility functie
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## 🤝 Bijdragen
+
+Dit is een educatief project voor het Webframeworks labo. Voor vragen of verbeteringen, neem contact op met de ontwikkelaar.
+
+## 📄 Licentie
+
+Dit project is eigendom van AP Hogeschool en bedoeld voor educatieve doeleinden.
