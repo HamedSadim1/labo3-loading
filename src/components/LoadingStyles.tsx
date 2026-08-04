@@ -59,6 +59,24 @@ const ClassicSpinner: React.FC = () => (
   </div>
 );
 
+const WaveBars: React.FC = () => (
+  <div
+    className="flex h-16 items-center justify-center gap-1.5 sm:h-20 sm:gap-2"
+    aria-hidden="true"
+  >
+    {[0, 1, 2, 3, 4].map((index) => (
+      <span
+        key={index}
+        className="h-8 w-1.5 animate-pulse rounded-full bg-linear-to-b from-cyan-300 via-violet-400 to-fuchsia-400 sm:w-2"
+        style={{
+          animationDelay: `${index * 0.12}s`,
+          animationDuration: "0.9s",
+        }}
+      />
+    ))}
+  </div>
+);
+
 export const LoadingStyleDisplay: React.FC<LoadingStyleProps> = ({
   style,
   isActive,
@@ -71,6 +89,7 @@ export const LoadingStyleDisplay: React.FC<LoadingStyleProps> = ({
     pulse: <PulseRing />,
     bar: <ProgressBar />,
     spinner: <ClassicSpinner />,
+    wave: <WaveBars />,
   };
 
   return (

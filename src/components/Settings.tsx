@@ -8,6 +8,7 @@ const LOADING_STYLES: { value: LoadingStyle; label: string; icon: string }[] = [
   { value: "pulse", label: "Pulse Ring", icon: "⭕" },
   { value: "bar", label: "Progress Bar", icon: "📊" },
   { value: "spinner", label: "Classic Spinner", icon: "💫" },
+  { value: "wave", label: "Wave Bars", icon: "〰️" },
 ];
 
 const Settings: React.FC = () => {

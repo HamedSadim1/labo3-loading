@@ -13,10 +13,12 @@ interface StageConfig {
   icon: React.ReactNode;
 }
 
+const LOADING_DURATION_MULTIPLIER = 2.5;
+
 const STAGES: StageConfig[] = [
   {
     label: "Initialiseren...",
-    duration: 1000,
+    duration: 1000 * LOADING_DURATION_MULTIPLIER,
     stageKey: "initializing",
     icon: (
       <svg
@@ -43,7 +45,7 @@ const STAGES: StageConfig[] = [
   },
   {
     label: "Verwerken...",
-    duration: 1500,
+    duration: 1500 * LOADING_DURATION_MULTIPLIER,
     stageKey: "processing",
     icon: (
       <svg
@@ -64,7 +66,7 @@ const STAGES: StageConfig[] = [
   },
   {
     label: "Afronden...",
-    duration: 800,
+    duration: 800 * LOADING_DURATION_MULTIPLIER,
     stageKey: "finalizing",
     icon: (
       <svg

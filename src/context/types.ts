@@ -1,4 +1,5 @@
-export type LoadingStyle = "fidget" | "dots" | "pulse" | "bar" | "spinner";
+export type LoadingStyle =
+  "fidget" | "dots" | "pulse" | "bar" | "spinner" | "wave";
 
 export type ToastType = "success" | "error" | "info" | "warning";
 
