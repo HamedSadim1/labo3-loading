@@ -136,7 +136,7 @@ const Chat: React.FC = () => {
         {/* Notification dot */}
         {messages.length > 1 && !isOpen && (
           <span
-            className="absolute -top-1 -right-1 flex h-3 w-3 items-center justify-center rounded-full bg-pink-500 animate-pulse"
+            className="absolute -top-1 -right-1 flex h-3 w-3 items-center justify-center rounded-full bg-fuchsia-400 animate-pulse"
             aria-label="Nieuwe berichten"
           >
             <span className="sr-only">Nieuwe berichten</span>
@@ -156,7 +156,7 @@ const Chat: React.FC = () => {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 sm:gap-3">
                 <div className="relative">
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-r from-blue-400 to-purple-400 flex items-center justify-center">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-linear-to-r from-cyan-300 via-violet-400 to-fuchsia-400 flex items-center justify-center">
                     <svg
                       className="w-4 h-4 sm:w-5 sm:h-5 text-white"
                       fill="none"
@@ -212,7 +212,7 @@ const Chat: React.FC = () => {
                 <div
                   className={`max-w-[85%] sm:max-w-[80%] px-3 sm:px-4 py-2 rounded-2xl ${
                     message.sender === "user"
-                      ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white"
+                      ? "bg-linear-to-r from-cyan-400 via-violet-500 to-fuchsia-500 text-white"
                       : "bg-white/10 text-white border border-white/10"
                   }`}
                 >
@@ -258,13 +258,13 @@ const Chat: React.FC = () => {
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="Typ een bericht..."
-                className="flex-1 bg-white/10 border border-white/20 rounded-xl px-3 sm:px-4 py-2 text-white text-xs sm:text-sm placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-transparent"
+                className="flex-1 bg-white/10 border border-white/20 rounded-xl px-3 sm:px-4 py-2 text-white text-xs sm:text-sm placeholder-white/40 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-cyan-300/40"
                 aria-label="Bericht invoeren"
               />
               <button
                 onClick={handleSendMessage}
                 disabled={!inputValue.trim()}
-                className="p-2 rounded-xl bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-white/30"
+                className="rounded-xl bg-linear-to-r from-cyan-400 via-violet-500 to-fuchsia-500 p-2 text-white transition-all duration-300 hover:from-cyan-300 hover:via-violet-400 hover:to-fuchsia-400 disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-cyan-300/40"
                 aria-label="Verstuur bericht"
               >
                 <svg

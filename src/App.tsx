@@ -59,7 +59,7 @@ const Footer: React.FC = () => {
   return (
     <footer className="mt-7 border-t border-white/10 pt-5 text-center sm:mt-9 sm:pt-6">
       <div className="flex items-center justify-center gap-2 text-[11px] text-white/35">
-        <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.8)]" />
+        <span className="h-1.5 w-1.5 rounded-full bg-cyan-300 shadow-[0_0_10px_rgba(103,232,249,0.8)]" />
         <span>Built for Labo 3</span>
       </div>
     </footer>

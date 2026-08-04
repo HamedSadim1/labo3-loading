@@ -112,7 +112,7 @@ const Settings: React.FC = () => {
                   <span className="text-sm sm:font-medium">{style.label}</span>
                   {loadingStyle === style.value && (
                     <svg
-                      className="w-4 h-4 sm:w-5 sm:h-5 ml-auto text-emerald-400"
+                      className="w-4 h-4 sm:w-5 sm:h-5 ml-auto text-cyan-300"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
