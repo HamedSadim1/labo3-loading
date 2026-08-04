@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion";
 
 type NumberFormat = "integer" | "decimal" | "percent";
 
@@ -30,15 +31,12 @@ const AnimatedNumber: React.FC<AnimatedNumberProps> = ({
 }) => {
   const [displayValue, setDisplayValue] = useState(0);
   const displayValueRef = useRef(0);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
-    const reduceMotion =
-      typeof window !== "undefined" &&
-      typeof window.matchMedia === "function" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const startValue = displayValueRef.current;
 
-    if (reduceMotion || startValue === value) {
+    if (prefersReducedMotion || startValue === value) {
       displayValueRef.current = value;
       setDisplayValue(value);
       return;
@@ -60,7 +58,7 @@ const AnimatedNumber: React.FC<AnimatedNumberProps> = ({
 
     frameId = window.requestAnimationFrame(animate);
     return () => window.cancelAnimationFrame(frameId);
-  }, [value]);
+  }, [prefersReducedMotion, value]);
 
   return <span>{formatValue(displayValue, format, suffix)}</span>;
 };

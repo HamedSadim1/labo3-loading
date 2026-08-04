@@ -1,12 +1,15 @@
 import React from "react";
 import DialogPanel from "./DialogPanel";
-import IconButton from "./IconButton";
+import PanelTrigger from "./PanelTrigger";
 import PanelHeader from "./PanelHeader";
 import { useApp } from "../context/useApp";
 import type { LoadingStyle } from "../context/types";
+import { usePanelToggle } from "../hooks/usePanelToggle";
+import PanelBody from "./PanelBody";
+import Icon from "./Icon";
 
 const LOADING_STYLES: { value: LoadingStyle; label: string; icon: string }[] = [
-  { value: "fidget", label: "Fidgetspinner", icon: "🔄" },
+  { value: "fidget", label: "Fidget spinner", icon: "🔄" },
   { value: "dots", label: "Stuiterende stippen", icon: "⚫" },
   { value: "pulse", label: "Pulserende ring", icon: "⭕" },
   { value: "bar", label: "Voortgangsbalk", icon: "📊" },
@@ -15,16 +18,8 @@ const LOADING_STYLES: { value: LoadingStyle; label: string; icon: string }[] = [
 ];
 
 const Settings: React.FC = () => {
-  const {
-    loadingStyle,
-    loading,
-    setLoadingStyle,
-    addToast,
-    activePanel,
-    openPanel,
-    closePanel,
-  } = useApp();
-  const isOpen = activePanel === "settings";
+  const { loadingStyle, loading, setLoadingStyle, addToast } = useApp();
+  const { isOpen, toggle, close } = usePanelToggle("settings");
 
   const handleStyleChange = (style: LoadingStyle) => {
     setLoadingStyle(style);
@@ -36,49 +31,32 @@ const Settings: React.FC = () => {
 
   return (
     <div className="relative">
-      <IconButton
+      <PanelTrigger
         label="Instellingen"
-        active={isOpen}
-        aria-expanded={isOpen}
-        aria-controls="settings-panel"
-        onClick={() => (isOpen ? closePanel() : openPanel("settings"))}
+        controls="settings-panel"
+        isOpen={isOpen}
+        onToggle={toggle}
       >
-        <svg
+        <Icon
+          name="settings"
           className="h-4 w-4 transition-transform duration-300 group-hover:rotate-90 sm:h-5 sm:w-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          aria-hidden="true"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M12 15.5a3.5 3.5 0 100-7 3.5 3.5 0 000 7z"
-          />
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06-1.8 1.8-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V20h-2.55v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06-1.8-1.8.06-.06A1.65 1.65 0 008.3 15a1.65 1.65 0 00-1.51-1H6.7v-2.55h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06 1.8-1.8.06.06a1.65 1.65 0 001.82.33 1.65 1.65 0 001-1.51v-.09h2.55v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06 1.8 1.8-.06.06A1.65 1.65 0 0018 10.45a1.65 1.65 0 001.51 1h.09V14h-.09a1.65 1.65 0 00-1.51 1z"
-          />
-        </svg>
-      </IconButton>
+        />
+      </PanelTrigger>
 
       <DialogPanel
         id="settings-panel"
         titleId="settings-title"
         open={isOpen}
-        onClose={closePanel}
+        onClose={close}
         className="sm:w-80"
       >
         <PanelHeader
           title="Instellingen"
           titleId="settings-title"
-          onClose={closePanel}
+          onClose={close}
         />
 
-        <div className="max-h-[calc(100dvh_-_10rem)] overflow-y-auto overscroll-contain p-4 sm:max-h-[calc(100dvh_-_12rem)] sm:p-6">
+        <PanelBody className="max-h-[calc(100dvh_-_10rem)] p-4 sm:max-h-[calc(100dvh_-_12rem)] sm:p-6">
           <fieldset disabled={loading.status === "running"}>
             <legend className="mb-3 text-sm font-medium text-white/85">
               Laadstijl
@@ -138,7 +116,7 @@ const Settings: React.FC = () => {
             Kies je favoriete laadstijl voor de demo. Tijdens het laden blijft
             de huidige stijl actief.
           </p>
-        </div>
+        </PanelBody>
       </DialogPanel>
     </div>
   );

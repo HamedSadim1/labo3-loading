@@ -1,9 +1,12 @@
 import React from "react";
 import AnimatedNumber from "./AnimatedNumber";
 import DialogPanel from "./DialogPanel";
-import IconButton from "./IconButton";
+import PanelTrigger from "./PanelTrigger";
 import PanelHeader from "./PanelHeader";
 import { useApp } from "../context/useApp";
+import { usePanelToggle } from "../hooks/usePanelToggle";
+import PanelBody from "./PanelBody";
+import Icon from "./Icon";
 
 interface StatCard {
   label: string;
@@ -12,8 +15,8 @@ interface StatCard {
 }
 
 const Dashboard: React.FC = () => {
-  const { metrics, activePanel, openPanel, closePanel } = useApp();
-  const isOpen = activePanel === "dashboard";
+  const { metrics } = useApp();
+  const { isOpen, toggle, close } = usePanelToggle("dashboard");
   const averageDuration = metrics.completedRuns
     ? metrics.totalDurationMs / metrics.completedRuns
     : 0;
@@ -23,7 +26,7 @@ const Dashboard: React.FC = () => {
     {
       label: "Totaal laden",
       value: <AnimatedNumber value={metrics.totalRuns} />,
-      icon: <span aria-hidden="true">↯</span>,
+      icon: <Icon name="runs" className="h-5 w-5" />,
     },
     {
       label: "Gemiddelde tijd",
@@ -36,7 +39,7 @@ const Dashboard: React.FC = () => {
       ) : (
         "—"
       ),
-      icon: <span aria-hidden="true">◷</span>,
+      icon: <Icon name="clock" className="h-5 w-5" />,
     },
     {
       label: "Succespercentage",
@@ -49,12 +52,12 @@ const Dashboard: React.FC = () => {
       ) : (
         "—"
       ),
-      icon: <span aria-hidden="true">✓</span>,
+      icon: <Icon name="success" className="h-5 w-5" />,
     },
     {
       label: "Recente runs",
       value: <AnimatedNumber value={recentRuns} />,
-      icon: <span aria-hidden="true">↗</span>,
+      icon: <Icon name="recent" className="h-5 w-5" />,
     },
   ];
 
@@ -71,44 +74,30 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="relative">
-      <IconButton
+      <PanelTrigger
         label="Dashboard"
-        active={isOpen}
-        aria-expanded={isOpen}
-        aria-controls="dashboard-panel"
-        onClick={() => (isOpen ? closePanel() : openPanel("dashboard"))}
+        controls="dashboard-panel"
+        isOpen={isOpen}
+        onToggle={toggle}
       >
-        <svg
-          className="h-4 w-4 sm:h-5 sm:w-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          aria-hidden="true"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-          />
-        </svg>
-      </IconButton>
+        <Icon name="dashboard" className="h-4 w-4 sm:h-5 sm:w-5" />
+      </PanelTrigger>
 
       <DialogPanel
         id="dashboard-panel"
         titleId="dashboard-title"
         open={isOpen}
-        onClose={closePanel}
+        onClose={close}
         className="sm:w-120 sm:max-w-[calc(100vw-2rem)]"
       >
         <PanelHeader
           title="Dashboard"
           titleId="dashboard-title"
           subtitle="Live gegevens uit je laadsessies"
-          onClose={closePanel}
+          onClose={close}
         />
 
-        <div className="max-h-[calc(100dvh_-_10rem)] overflow-y-auto overscroll-contain p-3 sm:max-h-[calc(100dvh_-_12rem)] sm:p-6">
+        <PanelBody className="max-h-[calc(100dvh_-_10rem)] p-3 sm:max-h-[calc(100dvh_-_12rem)] sm:p-6">
           <dl className="grid grid-cols-2 gap-3 sm:gap-4">
             {stats.map((stat) => (
               <div
@@ -178,7 +167,7 @@ const Dashboard: React.FC = () => {
               </p>
             )}
           </figure>
-        </div>
+        </PanelBody>
       </DialogPanel>
     </div>
   );

@@ -1,5 +1,6 @@
 import React from "react";
 import IconButton from "./IconButton";
+import Icon from "./Icon";
 
 interface PanelHeaderProps {
   title: string;
@@ -35,20 +36,7 @@ const PanelHeader: React.FC<PanelHeaderProps> = ({
         className="ml-3 shrink-0 sm:p-2"
         onClick={onClose}
       >
-        <svg
-          className="h-4 w-4 sm:h-5 sm:w-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          aria-hidden="true"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M6 18L18 6M6 6l12 12"
-          />
-        </svg>
+        <Icon name="close" className="h-4 w-4 sm:h-5 sm:w-5" />
       </IconButton>
     </header>
   );

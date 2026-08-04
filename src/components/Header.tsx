@@ -1,6 +1,7 @@
 import React from "react";
 import { useApp } from "../context/useApp";
 import { APP_TITLE } from "../constants/app";
+import Icon from "./Icon";
 
 const Header: React.FC = () => {
   const { loading } = useApp();
@@ -23,20 +24,7 @@ const Header: React.FC = () => {
       </div>
 
       <div className="mb-5 inline-flex h-16 w-16 items-center justify-center rounded-2xl border border-cyan-300/20 bg-linear-to-br from-cyan-300/20 to-violet-400/20 text-cyan-100 shadow-lg shadow-cyan-950/20 sm:h-20 sm:w-20">
-        <svg
-          className="h-8 w-8 sm:h-10 sm:w-10"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth={1.7}
-          aria-hidden="true"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M13 10V3L4 14h7v7l9-11h-7z"
-          />
-        </svg>
+        <Icon name="bolt" className="h-8 w-8 sm:h-10 sm:w-10" />
       </div>
 
       <h1 className="text-4xl font-extrabold tracking-[-0.04em] text-white sm:text-5xl">
