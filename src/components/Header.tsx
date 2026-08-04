@@ -5,11 +5,11 @@ const Header: React.FC = () => {
   return (
     <div className="mb-8 animate-slide-up sm:mb-10">
       <div className="mb-5 flex items-center justify-between text-left">
-        <div className="inline-flex items-center gap-2 rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-cyan-200">
+        <div className="inline-flex items-center gap-2 rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-cyan-200">
           <span className="h-1.5 w-1.5 rounded-full bg-cyan-300 shadow-[0_0_10px_rgba(103,232,249,0.9)]" />
           Ready
         </div>
-        <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-white/30">
+        <span className="text-xs font-medium uppercase tracking-[0.18em] text-white/55">
           v3.0
         </span>
       </div>
@@ -36,7 +36,7 @@ const Header: React.FC = () => {
           {APP_TITLE}
         </span>
       </h1>
-      <p className="mx-auto mt-3 max-w-xs text-sm leading-6 text-white/55 sm:text-base">
+      <p className="mx-auto mt-3 max-w-xs text-sm leading-6 text-white/65 sm:text-base">
         Een heldere, interactieve loading experience voor je labo-oefening.
       </p>
     </div>

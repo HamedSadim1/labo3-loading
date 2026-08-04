@@ -1,4 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
+import DialogPanel from "./DialogPanel";
+import IconButton from "./IconButton";
 import { useApp } from "../context/useApp";
 
 interface Message {
@@ -46,28 +48,15 @@ const Chat: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (!isOpen && responseTimerRef.current !== null) {
-      window.clearTimeout(responseTimerRef.current);
-      responseTimerRef.current = null;
-      setIsTyping(false);
-    }
-  }, [isOpen]);
-
-  const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+  }, [messages, isTyping]);
 
   const handleSendMessage = () => {
-    if (!inputValue.trim()) return;
+    if (!inputValue.trim() || isTyping) return;
 
     if (responseTimerRef.current !== null) {
       window.clearTimeout(responseTimerRef.current);
       responseTimerRef.current = null;
-      setIsTyping(false);
     }
 
     const userMessage: Message = {
@@ -77,7 +66,7 @@ const Chat: React.FC = () => {
       timestamp: new Date(),
     };
 
-    setMessages((prev) => [...prev, userMessage]);
+    setMessages((previous) => [...previous, userMessage]);
     setInputValue("");
     setIsTyping(true);
 
@@ -89,7 +78,7 @@ const Chat: React.FC = () => {
           sender: "bot",
           timestamp: new Date(),
         };
-        setMessages((prev) => [...prev, botResponse]);
+        setMessages((previous) => [...previous, botResponse]);
         setIsTyping(false);
         responseTimerRef.current = null;
       },
@@ -97,34 +86,38 @@ const Chat: React.FC = () => {
     );
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
       handleSendMessage();
     }
   };
 
   const handleOpen = () => {
-    openPanel("chat");
-    if (messages.length <= 1) {
-      addToast("Chat geopend", "info");
+    if (isOpen) {
+      closePanel();
+      return;
     }
+
+    openPanel("chat");
+    if (messages.length <= 1) addToast("Chat geopend", "info");
   };
 
   return (
     <div className="relative">
-      {/* Chat Toggle Button */}
-      <button
-        onClick={handleOpen}
-        className="group relative p-2.5 sm:p-3 rounded-xl bg-white/10 border border-white/20 text-white/70 hover:text-white hover:bg-white/20 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-white/30"
-        aria-label="Chat"
+      <IconButton
+        label={messages.length > 1 ? "Chat, nieuwe berichten" : "Chat"}
+        active={isOpen}
         aria-expanded={isOpen}
+        aria-controls="chat-panel"
+        onClick={handleOpen}
       >
         <svg
-          className="w-4 h-4 sm:w-5 sm:h-5"
+          className="h-4 w-4 sm:h-5 sm:w-5"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
+          aria-hidden="true"
         >
           <path
             strokeLinecap="round"
@@ -133,158 +126,153 @@ const Chat: React.FC = () => {
             d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
           />
         </svg>
-        {/* Notification dot */}
         {messages.length > 1 && !isOpen && (
           <span
-            className="absolute -top-1 -right-1 flex h-3 w-3 items-center justify-center rounded-full bg-fuchsia-400 animate-pulse"
-            aria-label="Nieuwe berichten"
-          >
-            <span className="sr-only">Nieuwe berichten</span>
-          </span>
+            className="absolute -right-1 -top-1 h-3 w-3 rounded-full bg-fuchsia-400 animate-pulse"
+            aria-hidden="true"
+          />
         )}
-      </button>
+      </IconButton>
 
-      {/* Chat Window - responsive */}
-      {isOpen && (
-        <div
-          role="dialog"
-          aria-label="Chat"
-          className="fixed inset-x-3 top-20 z-50 flex h-[min(70vh,30rem)] flex-col overflow-hidden rounded-2xl border border-white/20 bg-slate-900/95 shadow-2xl backdrop-blur-xl animate-slide-up sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:bottom-auto sm:mt-2 sm:h-96 sm:w-80 sm:max-h-[calc(100vh-7rem)] sm:overflow-y-auto sm:bg-white/10"
-        >
-          {/* Header */}
-          <div className="bg-white/10 border-b border-white/10 px-3 sm:px-4 py-2.5 sm:py-3 flex-shrink-0">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 sm:gap-3">
-                <div className="relative">
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-linear-to-r from-cyan-300 via-violet-400 to-fuchsia-400 flex items-center justify-center">
-                    <svg
-                      className="w-4 h-4 sm:w-5 sm:h-5 text-white"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                      />
-                    </svg>
-                  </div>
-                  <div className="absolute bottom-0 right-0 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-emerald-400 rounded-full border-2 border-white/10" />
-                </div>
-                <div>
-                  <h3 className="text-xs sm:text-sm font-semibold text-white">
-                    Chat Bot
-                  </h3>
-                  <p className="text-[10px] sm:text-xs text-white/50">Online</p>
-                </div>
-              </div>
-              <button
-                onClick={closePanel}
-                className="p-1 rounded-lg hover:bg-white/10 text-white/60 hover:text-white transition-colors"
-                aria-label="Sluiten"
+      <DialogPanel
+        id="chat-panel"
+        titleId="chat-title"
+        open={isOpen}
+        onClose={closePanel}
+        className="flex h-[min(70dvh,30rem)] flex-col sm:h-96 sm:w-80"
+      >
+        <div className="flex shrink-0 items-center justify-between border-b border-white/10 bg-white/10 px-3 py-3 sm:px-4">
+          <div className="flex items-center gap-3">
+            <div className="relative flex h-9 w-9 items-center justify-center rounded-full bg-linear-to-r from-cyan-300 via-violet-400 to-fuchsia-400 sm:h-10 sm:w-10">
+              <svg
+                className="h-4 w-4 text-white sm:h-5 sm:w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                aria-hidden="true"
               >
-                <svg
-                  className="w-4 h-4 sm:w-5 sm:h-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                />
+              </svg>
+              <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-slate-900 bg-emerald-400" />
+            </div>
+            <div>
+              <h2 id="chat-title" className="text-sm font-semibold text-white">
+                Chat Bot
+              </h2>
+              <p className="text-xs text-white/60">Online</p>
             </div>
           </div>
+          <IconButton
+            label="Sluiten"
+            className="p-1.5 sm:p-2"
+            onClick={closePanel}
+          >
+            <svg
+              className="h-4 w-4 sm:h-5 sm:w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </IconButton>
+        </div>
 
-          {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4">
-            {messages.map((message) => (
+        <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-3 sm:space-y-4 sm:p-4">
+          {messages.map((message) => (
+            <div
+              key={message.id}
+              className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}
+            >
               <div
-                key={message.id}
-                className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}
+                className={`max-w-[85%] rounded-2xl px-3 py-2 sm:max-w-[80%] sm:px-4 ${
+                  message.sender === "user"
+                    ? "bg-linear-to-r from-cyan-400 via-violet-500 to-fuchsia-500 text-white"
+                    : "border border-white/10 bg-white/10 text-white"
+                }`}
               >
-                <div
-                  className={`max-w-[85%] sm:max-w-[80%] px-3 sm:px-4 py-2 rounded-2xl ${
+                <p className="text-xs sm:text-sm">{message.text}</p>
+                <p
+                  className={`mt-1 text-[11px] ${
                     message.sender === "user"
-                      ? "bg-linear-to-r from-cyan-400 via-violet-500 to-fuchsia-500 text-white"
-                      : "bg-white/10 text-white border border-white/10"
+                      ? "text-white/75"
+                      : "text-white/55"
                   }`}
                 >
-                  <p className="text-xs sm:text-sm">{message.text}</p>
-                  <p
-                    className={`text-[10px] sm:text-xs mt-1 ${
-                      message.sender === "user"
-                        ? "text-white/70"
-                        : "text-white/40"
-                    }`}
-                  >
-                    {message.timestamp.toLocaleTimeString("nl-NL", {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </p>
-                </div>
+                  {message.timestamp.toLocaleTimeString("nl-NL", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </p>
               </div>
-            ))}
-
-            {/* Typing indicator */}
-            {isTyping && (
-              <div className="flex justify-start">
-                <div className="bg-white/10 border border-white/10 px-3 sm:px-4 py-2.5 sm:py-3 rounded-2xl">
-                  <div className="flex gap-1">
-                    <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white/50 rounded-full animate-bounce [animation-delay:0ms]" />
-                    <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white/50 rounded-full animate-bounce [animation-delay:150ms]" />
-                    <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white/50 rounded-full animate-bounce [animation-delay:300ms]" />
-                  </div>
-                </div>
-              </div>
-            )}
-
-            <div ref={messagesEndRef} />
-          </div>
-
-          {/* Input */}
-          <div className="border-t border-white/10 p-3 sm:p-4 flex-shrink-0">
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder="Typ een bericht..."
-                className="flex-1 bg-white/10 border border-white/20 rounded-xl px-3 sm:px-4 py-2 text-white text-xs sm:text-sm placeholder-white/40 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-cyan-300/40"
-                aria-label="Bericht invoeren"
-              />
-              <button
-                onClick={handleSendMessage}
-                disabled={!inputValue.trim()}
-                className="rounded-xl bg-linear-to-r from-cyan-400 via-violet-500 to-fuchsia-500 p-2 text-white transition-all duration-300 hover:from-cyan-300 hover:via-violet-400 hover:to-fuchsia-400 disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-cyan-300/40"
-                aria-label="Verstuur bericht"
-              >
-                <svg
-                  className="w-4 h-4 sm:w-5 sm:h-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-                  />
-                </svg>
-              </button>
             </div>
+          ))}
+
+          {isTyping && (
+            <div className="flex justify-start">
+              <div className="rounded-2xl border border-white/10 bg-white/10 px-4 py-3">
+                <div className="flex gap-1" aria-label="Chat bot typt">
+                  {[0, 1, 2].map((index) => (
+                    <span
+                      key={index}
+                      className="h-2 w-2 animate-bounce rounded-full bg-white/60"
+                      style={{ animationDelay: `${index * 150}ms` }}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+          <div ref={messagesEndRef} />
+        </div>
+
+        <div className="shrink-0 border-t border-white/10 p-3 sm:p-4">
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={inputValue}
+              onChange={(event) => setInputValue(event.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Typ een bericht..."
+              className="min-w-0 flex-1 rounded-xl border border-white/20 bg-white/10 px-3 py-2 text-sm text-white placeholder-white/50 focus:border-cyan-300/50 focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
+              aria-label="Bericht invoeren"
+            />
+            <button
+              type="button"
+              onClick={handleSendMessage}
+              disabled={!inputValue.trim() || isTyping}
+              className="rounded-xl bg-linear-to-r from-cyan-400 via-violet-500 to-fuchsia-500 p-2 text-white transition hover:from-cyan-300 hover:via-violet-400 hover:to-fuchsia-400 disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/50 active:scale-[0.97]"
+              aria-label="Verstuur bericht"
+            >
+              <svg
+                className="h-4 w-4 sm:h-5 sm:w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+                />
+              </svg>
+            </button>
           </div>
         </div>
-      )}
+      </DialogPanel>
     </div>
   );
 };

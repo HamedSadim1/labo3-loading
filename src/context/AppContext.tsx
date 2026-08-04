@@ -21,7 +21,6 @@ interface AppProviderProps {
 
 interface StoredSettings {
   loadingStyle?: LoadingStyle;
-  theme?: "dark" | "light";
   metrics?: LoadingMetrics;
 }
 
@@ -33,12 +32,27 @@ const DEFAULT_METRICS: LoadingMetrics = {
   recentDurations: [],
 };
 
+const isLoadingStyle = (value: unknown): value is LoadingStyle =>
+  value === "fidget" ||
+  value === "dots" ||
+  value === "pulse" ||
+  value === "bar" ||
+  value === "spinner" ||
+  value === "wave";
+
 const readStoredSettings = (): StoredSettings => {
   if (typeof window === "undefined") return {};
 
   try {
     const stored = window.localStorage.getItem(STORAGE_KEY);
-    return stored ? (JSON.parse(stored) as StoredSettings) : {};
+    if (!stored) return {};
+    const parsed = JSON.parse(stored) as StoredSettings;
+    return {
+      loadingStyle: isLoadingStyle(parsed.loadingStyle)
+        ? parsed.loadingStyle
+        : undefined,
+      metrics: isLoadingMetrics(parsed.metrics) ? parsed.metrics : undefined,
+    };
   } catch {
     return {};
   }
@@ -79,19 +93,14 @@ const isLoadingMetrics = (value: unknown): value is LoadingMetrics => {
 };
 
 export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
-  const storedSettings = readStoredSettings();
+  const [storedSettings] = useState<StoredSettings>(() => readStoredSettings());
   const [loadingStyle, setLoadingStyle] = useState<LoadingStyle>(
     storedSettings.loadingStyle ?? "fidget",
   );
   const [isLoading, setIsLoading] = useState(false);
-  const [theme, setTheme] = useState<"dark" | "light">(
-    storedSettings.theme ?? "dark",
-  );
   const [activePanel, setActivePanel] = useState<ActivePanel>(null);
   const [metrics, setMetrics] = useState<LoadingMetrics>(
-    isLoadingMetrics(storedSettings.metrics)
-      ? storedSettings.metrics
-      : DEFAULT_METRICS,
+    storedSettings.metrics ?? DEFAULT_METRICS,
   );
   const [toasts, setToasts] = useState<ToastItem[]>([]);
   const toastTimers = useRef<number[]>([]);
@@ -102,18 +111,12 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     try {
       window.localStorage.setItem(
         STORAGE_KEY,
-        JSON.stringify({
-          loadingStyle,
-          theme,
-          metrics,
-        } satisfies StoredSettings),
+        JSON.stringify({ loadingStyle, metrics } satisfies StoredSettings),
       );
     } catch {
       // Storage can be unavailable in private browsing or restricted iframes.
     }
-
-    document.documentElement.dataset.theme = theme;
-  }, [loadingStyle, theme, metrics]);
+  }, [loadingStyle, metrics]);
 
   useEffect(() => {
     return () => {
@@ -121,10 +124,6 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       toastTimers.current = [];
     };
   }, []);
-
-  const toggleTheme = useCallback(() => {
-    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
-  }, [setTheme]);
 
   const addToast = useCallback((message: string, type: ToastType = "info") => {
     const id = Date.now() + Math.random();
@@ -155,37 +154,21 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     }));
   }, []);
 
-  const openPanel = useCallback(
-    (panel: Exclude<ActivePanel, null>) => {
-      setActivePanel((current) => (current === panel ? null : panel));
-    },
-    [setActivePanel],
-  );
+  const openPanel = useCallback((panel: Exclude<ActivePanel, null>) => {
+    setActivePanel((current) => (current === panel ? null : panel));
+  }, []);
 
   const closePanel = useCallback(() => {
     setActivePanel(null);
-  }, [setActivePanel]);
-
-  useEffect(() => {
-    if (!activePanel) return;
-
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") closePanel();
-    };
-
-    document.addEventListener("keydown", handleEscape);
-    return () => document.removeEventListener("keydown", handleEscape);
-  }, [activePanel, closePanel]);
+  }, []);
 
   const contextValue: AppContextType = {
     loadingStyle,
     isLoading,
-    theme,
     activePanel,
     metrics,
     setLoadingStyle,
     setIsLoading,
-    toggleTheme,
     addToast,
     recordLoadingStart,
     recordLoadingComplete,

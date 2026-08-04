@@ -32,13 +32,13 @@ const STAGES: StageConfig[] = [
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeWidth={2}
-          d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+          d="M12 15.5a3.5 3.5 0 100-7 3.5 3.5 0 000 7z"
         />
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeWidth={2}
-          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+          d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06-1.8 1.8-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V20h-2.55v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06-1.8-1.8.06-.06A1.65 1.65 0 008.3 15a1.65 1.65 0 00-1.51-1H6.7v-2.55h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06 1.8-1.8.06.06a1.65 1.65 0 001.82.33 1.65 1.65 0 001-1.51v-.09h2.55v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06 1.8 1.8-.06.06a1.65 1.65 0 00-.33 1.82 1.65 1.65 0 001.51 1h.09V14h-.09a1.65 1.65 0 00-1.51 1z"
         />
       </svg>
     ),
@@ -174,7 +174,6 @@ const Loading: React.FC = () => {
       {loading ? (
         <div className="space-y-5" role="status" aria-live="polite">
           <LoadingStyleDisplay style={loadingStyle} isActive />
-
           <div
             className="space-y-3"
             role="progressbar"
@@ -183,9 +182,9 @@ const Loading: React.FC = () => {
             aria-valuemax={100}
             aria-label={`Laden: ${Math.round(progress)} procent`}
           >
-            <div className="flex items-center justify-between text-[11px] font-medium uppercase tracking-[0.16em] text-white/45">
+            <div className="flex items-center justify-between text-xs font-medium uppercase tracking-[0.16em] text-white/65">
               <span>Progress</span>
-              <span className="font-mono text-cyan-200/80">
+              <span className="font-mono text-cyan-200">
                 {Math.round(progress)}%
               </span>
             </div>
@@ -197,15 +196,13 @@ const Loading: React.FC = () => {
               <div className="absolute inset-0 animate-gradient bg-linear-to-r from-transparent via-white/30 to-transparent bg-size-[200%_100%]" />
             </div>
           </div>
-
-          <div className="flex items-center justify-center gap-2.5 text-sm text-white/75">
+          <div className="flex items-center justify-center gap-2.5 text-sm text-white/85">
             <span className="text-cyan-200">{currentStage?.icon}</span>
             <span>{currentStage?.label}</span>
           </div>
-
           {stage === "complete" && (
             <div className="flex justify-center animate-fade-in">
-              <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-4 py-2 text-sm font-medium text-emerald-300">
+              <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/25 bg-emerald-400/10 px-4 py-2 text-sm font-medium text-emerald-200">
                 <span aria-hidden="true">✓</span>
                 Klaar om opnieuw te starten
               </div>
@@ -217,12 +214,12 @@ const Loading: React.FC = () => {
           <button
             type="button"
             onClick={handleLoading}
-            className="group relative inline-flex w-full items-center justify-center overflow-hidden rounded-2xl bg-linear-to-r from-cyan-400 via-violet-500 to-fuchsia-500 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-violet-950/30 transition duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-violet-950/40 focus:outline-none focus-visible:ring-4 focus-visible:ring-cyan-300/25 active:translate-y-0 sm:py-4"
+            className="group relative inline-flex w-full items-center justify-center overflow-hidden rounded-2xl bg-linear-to-r from-cyan-400 via-violet-500 to-fuchsia-500 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-violet-950/30 transition duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-cyan-950/40 focus:outline-none focus-visible:ring-4 focus-visible:ring-cyan-300/25 active:scale-[0.98] active:translate-y-0 sm:py-4"
           >
-            <span className="absolute inset-0 bg-white/20 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+            <span className="pointer-events-none absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/40 to-transparent transition-transform duration-1000 ease-in-out group-hover:translate-x-full group-focus-visible:translate-x-full" />
             <span className="relative flex items-center justify-center gap-2.5">
               <svg
-                className="h-5 w-5 transition-transform duration-300 group-hover:rotate-12"
+                className="h-5 w-5 transition-transform duration-300 group-hover:rotate-12 group-active:scale-90"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -244,7 +241,7 @@ const Loading: React.FC = () => {
               Start loading
             </span>
           </button>
-          <p className="text-center text-xs text-white/40">
+          <p className="text-center text-xs leading-5 text-white/55">
             Kies een stijl via instellingen en start de demo.
           </p>
         </div>

@@ -6,9 +6,9 @@ interface GlassCardProps {
 
 const GlassCard: React.FC<GlassCardProps> = ({ children }) => {
   return (
-    <div className="group relative">
-      <div className="pointer-events-none absolute -inset-1 rounded-[2rem] bg-linear-to-r from-cyan-400/20 via-violet-400/20 to-fuchsia-400/20 opacity-60 blur-2xl transition-opacity duration-500 group-hover:opacity-100" />
-      <section className="relative overflow-hidden rounded-[1.75rem] border border-white/15 bg-slate-900/70 p-6 text-center shadow-2xl shadow-slate-950/40 backdrop-blur-2xl transition-transform duration-500 sm:p-9 group-hover:-translate-y-0.5 group-hover:bg-slate-900/80">
+    <div className="relative">
+      <div className="pointer-events-none absolute -inset-1 rounded-[2rem] bg-linear-to-r from-cyan-400/20 via-violet-400/20 to-fuchsia-400/20 opacity-70 blur-2xl" />
+      <section className="relative overflow-hidden rounded-[1.75rem] border border-white/15 bg-slate-900/75 p-6 text-center shadow-2xl shadow-slate-950/40 backdrop-blur-2xl sm:p-9">
         <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-linear-to-r from-transparent via-white/50 to-transparent" />
         <div className="pointer-events-none absolute inset-0 bg-linear-to-b from-white/[0.08] via-transparent to-transparent" />
         <div className="relative z-10">{children}</div>
