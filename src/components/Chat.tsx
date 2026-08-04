@@ -14,20 +14,15 @@ import {
   CHAT_WELCOME_MESSAGE,
 } from "../constants/chat";
 import { PANEL_IDS, PANEL_KEYS } from "../constants/panels";
-
-interface Message {
-  id: string;
-  text: string;
-  sender: "user" | "bot";
-  timestamp: Date;
-}
+import ChatComposer from "./ChatComposer";
+import ChatMessageList, { type ChatMessage } from "./ChatMessageList";
 
 const Chat: React.FC = () => {
   const panel = PANEL_IDS.chat;
   const { isOpen, toggle, close } = usePanelToggle(PANEL_KEYS.chat);
   const prefersReducedMotion = usePrefersReducedMotion();
   const isOpenRef = useRef(isOpen);
-  const [messages, setMessages] = useState<Message[]>([
+  const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: "welcome",
       text: CHAT_WELCOME_MESSAGE,
@@ -63,7 +58,7 @@ const Chat: React.FC = () => {
     const text = inputValue.trim();
     if (!text || isTyping) return;
 
-    const userMessage: Message = {
+    const userMessage: ChatMessage = {
       id: createId("message"),
       text,
       sender: "user",
@@ -76,7 +71,7 @@ const Chat: React.FC = () => {
 
     responseTimerRef.current = window.setTimeout(
       () => {
-        const botResponse: Message = {
+        const botResponse: ChatMessage = {
           id: createId("message"),
           text: BOT_RESPONSES[Math.floor(Math.random() * BOT_RESPONSES.length)],
           sender: "bot",
@@ -137,83 +132,19 @@ const Chat: React.FC = () => {
         />
 
         <PanelBody className="flex-1 p-3 sm:p-4">
-          <ul className="space-y-3 sm:space-y-4" aria-label="Chatberichten">
-            {messages.map((message) => (
-              <li
-                key={message.id}
-                className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}
-              >
-                <div
-                  className={`max-w-[85%] rounded-2xl px-3 py-2 sm:max-w-[80%] sm:px-4 ${
-                    message.sender === "user"
-                      ? "brand-gradient text-white"
-                      : "border border-white/10 bg-white/10 text-white"
-                  }`}
-                >
-                  <p className="text-sm">{message.text}</p>
-                  <time
-                    className="mt-1 block text-xs text-white/75"
-                    dateTime={message.timestamp.toISOString()}
-                  >
-                    {message.timestamp.toLocaleTimeString("nl-NL", {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </time>
-                </div>
-              </li>
-            ))}
-
-            {isTyping && (
-              <li className="flex justify-start">
-                <div className="rounded-2xl border border-white/10 bg-white/10 px-4 py-3">
-                  <div className="flex gap-1" role="status">
-                    <span className="sr-only">Chatbot typt</span>
-                    {[0, 1, 2].map((index) => (
-                      <span
-                        key={index}
-                        className="h-2 w-2 motion-safe:animate-bounce rounded-full bg-white/60"
-                        style={{ animationDelay: `${index * 150}ms` }}
-                        aria-hidden="true"
-                      />
-                    ))}
-                  </div>
-                </div>
-              </li>
-            )}
-            <li ref={messagesEndRef} aria-hidden="true" />
-          </ul>
+          <ChatMessageList
+            messages={messages}
+            isTyping={isTyping}
+            messagesEndRef={messagesEndRef}
+          />
         </PanelBody>
 
-        <form
-          className="shrink-0 border-t border-white/10 p-3 sm:p-4"
-          onSubmit={(event) => {
-            event.preventDefault();
-            handleSendMessage();
-          }}
-        >
-          <div className="flex gap-2">
-            <label htmlFor="chat-message" className="sr-only">
-              Bericht invoeren
-            </label>
-            <input
-              id="chat-message"
-              type="text"
-              value={inputValue}
-              onChange={(event) => setInputValue(event.target.value)}
-              placeholder="Typ een bericht..."
-              className="min-w-0 flex-1 rounded-xl border border-white/20 bg-white/10 px-3 py-2 text-base text-white placeholder-white/70 focus:border-cyan-300/50 focus:outline-none focus:ring-2 focus:ring-cyan-300/30 sm:text-sm"
-            />
-            <button
-              type="submit"
-              disabled={!inputValue.trim() || isTyping}
-              className="min-h-11 min-w-11 rounded-xl brand-gradient-interactive p-2 text-white transition disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/50 active:scale-[0.97]"
-              aria-label="Bericht versturen"
-            >
-              <Icon name="send" className="h-4 w-4 sm:h-5 sm:w-5" />
-            </button>
-          </div>
-        </form>
+        <ChatComposer
+          value={inputValue}
+          isTyping={isTyping}
+          onChange={setInputValue}
+          onSend={handleSendMessage}
+        />
       </DialogPanel>
     </div>
   );
