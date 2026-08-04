@@ -1,5 +1,6 @@
 import React from "react";
 import { CHAT_CONFIG } from "@/constants";
+import { cn } from "@/utils/cn";
 
 export interface ChatMessage {
   id: string;
@@ -23,14 +24,18 @@ const ChatMessageList: React.FC<ChatMessageListProps> = ({
     {messages.map((message) => (
       <li
         key={message.id}
-        className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}
+        className={cn(
+          "flex",
+          message.sender === "user" ? "justify-end" : "justify-start",
+        )}
       >
         <div
-          className={`max-w-[85%] rounded-2xl px-3 py-2 sm:max-w-[80%] sm:px-4 ${
+          className={cn(
+            "max-w-[85%] rounded-2xl px-3 py-2 sm:max-w-[80%] sm:px-4",
             message.sender === "user"
               ? "brand-gradient text-white"
-              : "border border-white/10 bg-white/10 text-white"
-          }`}
+              : "border border-white/10 bg-white/10 text-white",
+          )}
         >
           <p className="text-sm">{message.text}</p>
           <time

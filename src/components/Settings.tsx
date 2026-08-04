@@ -8,6 +8,7 @@ import { usePanelToggle } from "@/hooks/usePanelToggle";
 import PanelBody from "@/components/PanelBody";
 import Icon from "@/components/Icon";
 import { LOADING_CONFIG, PANEL_CONFIG, SETTINGS_CONFIG } from "@/constants";
+import { cn } from "@/utils/cn";
 
 const Settings: React.FC = () => {
   const panel = PANEL_CONFIG.settings;
@@ -93,11 +94,12 @@ const Settings: React.FC = () => {
                   }}
                   data-style={style.value}
                   onClick={() => handleStyleChange(style.value)}
-                  className={`flex min-h-11 w-full items-center gap-3 rounded-xl border px-3 py-3 text-left transition duration-200 focus:outline-none brand-focus disabled:cursor-not-allowed disabled:opacity-60 ${
+                  className={cn(
+                    "flex min-h-11 w-full items-center gap-3 rounded-xl border px-3 py-3 text-left transition duration-200 focus:outline-none brand-focus disabled:cursor-not-allowed disabled:opacity-60",
                     loadingStyle === style.value
                       ? "border-cyan-300/40 bg-cyan-300/10 text-white"
-                      : "border-transparent bg-white/5 text-white/80 hover:bg-white/10 hover:text-white"
-                  }`}
+                      : "border-transparent bg-white/5 text-white/80 hover:bg-white/10 hover:text-white",
+                  )}
                 >
                   <span className="text-lg sm:text-xl" aria-hidden="true">
                     {style.icon}

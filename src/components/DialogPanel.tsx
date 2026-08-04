@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { DIALOG_CONFIG, DOM_IDS } from "@/constants";
+import { cn } from "@/utils/cn";
 
 interface DialogPanelProps {
   id: string;
@@ -118,7 +119,10 @@ const DialogPanel: React.FC<DialogPanelProps> = ({
         aria-modal="true"
         aria-labelledby={titleId}
         tabIndex={-1}
-        className={`fixed inset-x-3 top-[max(4.5rem,env(safe-area-inset-top))] z-[100] flex max-h-[calc(100dvh_-_6rem_-_env(safe-area-inset-bottom))] flex-col overflow-hidden overscroll-contain rounded-2xl border border-white/20 bg-slate-900/95 shadow-2xl shadow-slate-950/30 backdrop-blur-xl motion-safe:animate-slide-up sm:inset-x-auto sm:right-4 sm:top-[calc(4.5rem_+_env(safe-area-inset-top))] sm:mt-2 sm:max-h-[calc(100dvh_-_7rem_-_env(safe-area-inset-bottom))] sm:bg-white/10 ${className}`}
+        className={cn(
+          "fixed inset-x-3 top-[max(4.5rem,env(safe-area-inset-top))] z-[100] flex max-h-[calc(100dvh_-_6rem_-_env(safe-area-inset-bottom))] flex-col overflow-hidden overscroll-contain rounded-2xl border border-white/20 bg-slate-900/95 shadow-2xl shadow-slate-950/30 backdrop-blur-xl motion-safe:animate-slide-up sm:inset-x-auto sm:right-4 sm:top-[calc(4.5rem_+_env(safe-area-inset-top))] sm:mt-2 sm:max-h-[calc(100dvh_-_7rem_-_env(safe-area-inset-bottom))] sm:bg-white/10",
+          className,
+        )}
         onMouseDown={(event) => event.stopPropagation()}
         onClick={(event) => event.stopPropagation()}
       >

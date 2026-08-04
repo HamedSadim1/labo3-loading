@@ -2,6 +2,7 @@ import React from "react";
 import { useApp } from "@/context/useApp";
 import { APP_CONFIG } from "@/constants";
 import Icon from "@/components/Icon";
+import { cn } from "@/utils/cn";
 
 const Header: React.FC = () => {
   const { loading } = useApp();
@@ -17,7 +18,10 @@ const Header: React.FC = () => {
       <div className="mb-5 flex items-center justify-between text-left">
         <div className="inline-flex items-center gap-2 rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-cyan-200">
           <span
-            className={`h-1.5 w-1.5 rounded-full ${statusClass} shadow-[0_0_10px_rgba(103,232,249,0.9)]`}
+            className={cn(
+              "h-1.5 w-1.5 rounded-full shadow-[0_0_10px_rgba(103,232,249,0.9)]",
+              statusClass,
+            )}
           />
           <span role="status">{statusLabel}</span>
         </div>

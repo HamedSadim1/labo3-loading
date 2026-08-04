@@ -1,4 +1,5 @@
 import React from "react";
+import { cn } from "@/utils/cn";
 
 interface PanelBodyProps {
   children: React.ReactNode;
@@ -7,7 +8,9 @@ interface PanelBodyProps {
 
 const PanelBody: React.FC<PanelBodyProps> = ({ children, className = "" }) => {
   return (
-    <div className={`min-h-0 overflow-y-auto overscroll-contain ${className}`}>
+    <div
+      className={cn("min-h-0 overflow-y-auto overscroll-contain", className)}
+    >
       {children}
     </div>
   );

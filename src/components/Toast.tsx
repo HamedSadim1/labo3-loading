@@ -1,6 +1,7 @@
 import React from "react";
 import type { ToastType } from "@/context/types";
 import { UI_COPY } from "@/constants";
+import { cn } from "@/utils/cn";
 
 interface ToastProps {
   message: string;
@@ -25,7 +26,10 @@ const Toast: React.FC<ToastProps> = ({ message, type, onClose }) => {
 
   return (
     <div
-      className={`flex w-full items-center gap-3 rounded-xl border px-4 py-3 shadow-2xl shadow-slate-950/30 backdrop-blur-xl animate-slide-up ${typeStyles[type]}`}
+      className={cn(
+        "flex w-full items-center gap-3 rounded-xl border px-4 py-3 shadow-2xl shadow-slate-950/30 backdrop-blur-xl animate-slide-up",
+        typeStyles[type],
+      )}
       role={type === "error" ? "alert" : "status"}
       aria-live={type === "error" ? "assertive" : "polite"}
     >
