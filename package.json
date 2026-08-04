@@ -7,7 +7,6 @@
     "@tailwindcss/vite": "^4.3.3",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
-    "react-loader-spinner": "^8.0.2",
     "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
@@ -27,7 +26,6 @@
     "eslint-plugin-react-refresh": "^0.5.3",
     "husky": "^9.1.7",
     "knip": "^6.31.0",
-    "lint-staged": "^17.3.0",
     "prettier": "^3.9.6",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.66.0",
