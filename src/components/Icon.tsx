@@ -1,5 +1,5 @@
 import React from "react";
-import type { IconName } from "../constants";
+import type { IconName } from "@/constants";
 
 export type { IconName };
 

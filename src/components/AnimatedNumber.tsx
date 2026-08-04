@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
-import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion";
-import { ANIMATION_CONFIG } from "../constants";
-import { formatNumber, type NumberFormat } from "../utils/formatters";
+import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
+import { ANIMATION_CONFIG } from "@/constants";
+import { formatNumber, type NumberFormat } from "@/utils/formatters";
 
 interface AnimatedNumberProps {
   value: number;

@@ -1,13 +1,13 @@
 import React from "react";
-import DialogPanel from "./DialogPanel";
-import PanelTrigger from "./PanelTrigger";
-import PanelHeader from "./PanelHeader";
-import { useApp } from "../context/useApp";
-import type { LoadingStyle } from "../constants";
-import { usePanelToggle } from "../hooks/usePanelToggle";
-import PanelBody from "./PanelBody";
-import Icon from "./Icon";
-import { LOADING_CONFIG, PANEL_CONFIG, SETTINGS_CONFIG } from "../constants";
+import DialogPanel from "@/components/DialogPanel";
+import PanelTrigger from "@/components/PanelTrigger";
+import PanelHeader from "@/components/PanelHeader";
+import { useApp } from "@/context/useApp";
+import type { LoadingStyle } from "@/constants";
+import { usePanelToggle } from "@/hooks/usePanelToggle";
+import PanelBody from "@/components/PanelBody";
+import Icon from "@/components/Icon";
+import { LOADING_CONFIG, PANEL_CONFIG, SETTINGS_CONFIG } from "@/constants";
 
 const Settings: React.FC = () => {
   const panel = PANEL_CONFIG.settings;

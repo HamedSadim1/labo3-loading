@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import { DIALOG_CONFIG, DOM_IDS } from "../constants";
+import { DIALOG_CONFIG, DOM_IDS } from "@/constants";
 
 interface DialogPanelProps {
   id: string;

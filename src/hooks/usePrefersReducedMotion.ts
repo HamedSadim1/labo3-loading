@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import {
   getPrefersReducedMotion,
   REDUCED_MOTION_QUERY,
-} from "../utils/accessibility";
+} from "@/utils/accessibility";
 
 export const usePrefersReducedMotion = (): boolean => {
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(

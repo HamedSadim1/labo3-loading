@@ -1,7 +1,7 @@
-import type { LoadingMetrics, LoadingStyle } from "../constants";
-import { STORAGE_CONFIG } from "../constants";
-import { isLoadingStyle } from "./loading";
-import { normalizeMetrics } from "./metrics";
+import type { LoadingMetrics, LoadingStyle } from "@/constants";
+import { STORAGE_CONFIG } from "@/constants";
+import { isLoadingStyle } from "@/utils/loading";
+import { normalizeMetrics } from "@/utils/metrics";
 
 export interface StoredSettings {
   version?: typeof STORAGE_CONFIG.version;

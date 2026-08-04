@@ -1,6 +1,6 @@
 import React from "react";
-import Icon from "./Icon";
-import { LOADING_UI_COPY } from "../constants";
+import Icon from "@/components/Icon";
+import { LOADING_UI_COPY } from "@/constants";
 
 interface LoadingIdleViewProps {
   onStart: () => void;

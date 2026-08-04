@@ -5,7 +5,7 @@ import type {
   LoadingState,
   LoadingStyle,
   ToastType,
-} from "./types";
+} from "@/context/types";
 
 export interface AppContextType {
   loadingStyle: LoadingStyle;

@@ -3,7 +3,7 @@ import type {
   LoadingState,
   LoadingStyle,
   PanelKey,
-} from "../constants";
+} from "@/constants";
 
 export type { LoadingState, LoadingStyle };
 

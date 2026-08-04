@@ -5,28 +5,28 @@ import React, {
   useRef,
   type ReactNode,
 } from "react";
-import Toast from "../components/Toast";
+import Toast from "@/components/Toast";
 import {
   APP_CONFIG,
   DEFAULT_LOADING_STYLE,
   STORAGE_CONFIG,
   DOM_IDS,
   ID_PREFIXES,
-} from "../constants";
-import { AppContext, type AppContextType } from "./context";
+} from "@/constants";
+import { AppContext, type AppContextType } from "@/context/context";
 import type {
   ActivePanel,
   LoadingMetrics,
   ToastType,
   Toast as ToastItem,
-} from "./types";
-import { createId } from "../utils/createId";
-import { createDefaultLoadingState } from "../utils/loading";
-import { clampDuration, createDefaultMetrics } from "../utils/metrics";
+} from "@/context/types";
+import { createId } from "@/utils/createId";
+import { createDefaultLoadingState } from "@/utils/loading";
+import { clampDuration, createDefaultMetrics } from "@/utils/metrics";
 import {
   readStoredSettings,
   writeStoredSettings,
-} from "../utils/settingsStorage";
+} from "@/utils/settingsStorage";
 
 interface AppProviderProps {
   children: ReactNode;

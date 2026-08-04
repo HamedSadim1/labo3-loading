@@ -2,7 +2,7 @@ import {
   LOADING_CONFIG,
   type LoadingState,
   type LoadingStyle,
-} from "../constants";
+} from "@/constants";
 
 export const createDefaultLoadingState = (): LoadingState => ({
   status: "idle",

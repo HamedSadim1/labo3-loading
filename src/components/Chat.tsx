@@ -1,15 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
-import DialogPanel from "./DialogPanel";
-import PanelTrigger from "./PanelTrigger";
-import PanelHeader from "./PanelHeader";
-import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion";
-import { createId } from "../utils/createId";
-import PanelBody from "./PanelBody";
-import { usePanelToggle } from "../hooks/usePanelToggle";
-import Icon from "./Icon";
-import { CHAT_CONFIG, ID_PREFIXES, PANEL_CONFIG } from "../constants";
-import ChatComposer from "./ChatComposer";
-import ChatMessageList, { type ChatMessage } from "./ChatMessageList";
+import DialogPanel from "@/components/DialogPanel";
+import PanelTrigger from "@/components/PanelTrigger";
+import PanelHeader from "@/components/PanelHeader";
+import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
+import { createId } from "@/utils/createId";
+import PanelBody from "@/components/PanelBody";
+import { usePanelToggle } from "@/hooks/usePanelToggle";
+import Icon from "@/components/Icon";
+import { CHAT_CONFIG, ID_PREFIXES, PANEL_CONFIG } from "@/constants";
+import ChatComposer from "@/components/ChatComposer";
+import ChatMessageList, {
+  type ChatMessage,
+} from "@/components/ChatMessageList";
 
 const Chat: React.FC = () => {
   const panel = PANEL_CONFIG.chat;

@@ -1,5 +1,5 @@
-import type { ActivePanel } from "../context/types";
-import { useApp } from "../context/useApp";
+import type { ActivePanel } from "@/context/types";
+import { useApp } from "@/context/useApp";
 
 export const usePanelToggle = (panel: Exclude<ActivePanel, null>) => {
   const { activePanel, openPanel, closePanel } = useApp();

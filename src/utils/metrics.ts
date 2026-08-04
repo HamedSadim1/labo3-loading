@@ -1,4 +1,4 @@
-import { STORAGE_CONFIG, type LoadingMetrics } from "../constants";
+import { STORAGE_CONFIG, type LoadingMetrics } from "@/constants";
 
 export const createDefaultMetrics = (): LoadingMetrics => ({
   totalRuns: 0,

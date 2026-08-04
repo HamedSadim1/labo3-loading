@@ -1,14 +1,14 @@
 import React, { useCallback, useEffect, useRef } from "react";
-import { delay } from "../utils/delay";
-import { useApp } from "../context/useApp";
-import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion";
-import { DOM_IDS, LOADING_CONFIG, LOADING_UI_COPY } from "../constants";
+import { delay } from "@/utils/delay";
+import { useApp } from "@/context/useApp";
+import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
+import { DOM_IDS, LOADING_CONFIG, LOADING_UI_COPY } from "@/constants";
 import {
   createDefaultLoadingState,
   getTotalLoadingDuration,
-} from "../utils/loading";
-import LoadingActiveView from "./LoadingActiveView";
-import LoadingIdleView from "./LoadingIdleView";
+} from "@/utils/loading";
+import LoadingActiveView from "@/components/LoadingActiveView";
+import LoadingIdleView from "@/components/LoadingIdleView";
 
 const Loading: React.FC = () => {
   const {

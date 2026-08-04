@@ -1,7 +1,7 @@
 import React from "react";
-import { useApp } from "../context/useApp";
-import { APP_CONFIG } from "../constants";
-import Icon from "./Icon";
+import { useApp } from "@/context/useApp";
+import { APP_CONFIG } from "@/constants";
+import Icon from "@/components/Icon";
 
 const Header: React.FC = () => {
   const { loading } = useApp();

@@ -1,4 +1,4 @@
-import { NUMBER_FORMAT_CONFIG } from "../constants";
+import { NUMBER_FORMAT_CONFIG } from "@/constants";
 
 export type NumberFormat = "integer" | "decimal" | "percent";
 

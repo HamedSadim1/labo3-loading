@@ -1,7 +1,7 @@
 import React from "react";
-import IconButton from "./IconButton";
-import Icon from "./Icon";
-import { PANEL_UI_COPY } from "../constants";
+import IconButton from "@/components/IconButton";
+import Icon from "@/components/Icon";
+import { PANEL_UI_COPY } from "@/constants";
 
 interface PanelHeaderProps {
   title: string;

@@ -1,6 +1,6 @@
 import React from "react";
-import type { LoadingStyle } from "../constants";
-import { LOADING_CONFIG } from "../constants";
+import type { LoadingStyle } from "@/constants";
+import { LOADING_CONFIG } from "@/constants";
 
 interface LoadingStyleProps {
   style: LoadingStyle;

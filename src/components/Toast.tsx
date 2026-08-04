@@ -1,6 +1,6 @@
 import React from "react";
-import type { ToastType } from "../context/types";
-import { UI_COPY } from "../constants";
+import type { ToastType } from "@/context/types";
+import { UI_COPY } from "@/constants";
 
 interface ToastProps {
   message: string;

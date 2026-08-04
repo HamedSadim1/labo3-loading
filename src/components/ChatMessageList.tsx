@@ -1,5 +1,5 @@
 import React from "react";
-import { CHAT_CONFIG } from "../constants";
+import { CHAT_CONFIG } from "@/constants";
 
 export interface ChatMessage {
   id: string;

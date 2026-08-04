@@ -1,5 +1,5 @@
 import React from "react";
-import { DASHBOARD_CONFIG } from "../constants";
+import { DASHBOARD_CONFIG } from "@/constants";
 
 export interface DashboardChartPoint {
   duration: number;
