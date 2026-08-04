@@ -1,7 +1,7 @@
 import React from "react";
 import { useApp } from "@/context/useApp";
 import { APP_CONFIG } from "@/constants";
-import Icon from "@/components/Icon";
+import Icon from "@/components/shared/Icon";
 import { cn } from "@/utils/cn";
 
 const Header: React.FC = () => {

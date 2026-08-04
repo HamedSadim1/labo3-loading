@@ -1,12 +1,12 @@
 import React from "react";
 import { AppProvider } from "@/context/AppContext";
-import Background from "@/components/Background";
-import GlassCard from "@/components/GlassCard";
-import Header from "@/components/Header";
-import Loading from "@/components/Loading";
-import Settings from "@/components/Settings";
-import Chat from "@/components/Chat";
-import Dashboard from "@/components/Dashboard";
+import Background from "@/components/layout/Background";
+import GlassCard from "@/components/layout/GlassCard";
+import Header from "@/components/layout/Header";
+import Loading from "@/components/loading/Loading";
+import Settings from "@/components/settings/Settings";
+import Chat from "@/components/chat/Chat";
+import Dashboard from "@/components/dashboard/Dashboard";
 import { APP_CONFIG, DOM_IDS } from "@/constants";
 
 function App() {

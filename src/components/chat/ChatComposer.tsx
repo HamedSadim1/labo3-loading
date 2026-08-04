@@ -1,5 +1,5 @@
 import React from "react";
-import Icon from "@/components/Icon";
+import Icon from "@/components/shared/Icon";
 import { CHAT_CONFIG, DOM_IDS } from "@/constants";
 
 interface ChatComposerProps {

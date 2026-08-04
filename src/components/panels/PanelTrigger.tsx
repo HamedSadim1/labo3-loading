@@ -1,5 +1,5 @@
 import React from "react";
-import IconButton from "@/components/IconButton";
+import IconButton from "@/components/shared/IconButton";
 
 interface PanelTriggerProps {
   label: string;

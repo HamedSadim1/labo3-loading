@@ -1,19 +1,19 @@
 import React from "react";
-import AnimatedNumber from "@/components/AnimatedNumber";
-import DialogPanel from "@/components/DialogPanel";
-import PanelTrigger from "@/components/PanelTrigger";
-import PanelHeader from "@/components/PanelHeader";
+import AnimatedNumber from "@/components/shared/AnimatedNumber";
+import DialogPanel from "@/components/panels/DialogPanel";
+import PanelTrigger from "@/components/panels/PanelTrigger";
+import PanelHeader from "@/components/panels/PanelHeader";
 import { useApp } from "@/context/useApp";
 import { usePanelToggle } from "@/hooks/usePanelToggle";
-import PanelBody from "@/components/PanelBody";
-import Icon from "@/components/Icon";
+import PanelBody from "@/components/panels/PanelBody";
+import Icon from "@/components/shared/Icon";
 import { DASHBOARD_CONFIG, PANEL_CONFIG, UI_COPY } from "@/constants";
 import DashboardStats, {
   type DashboardStat,
-} from "@/components/DashboardStats";
+} from "@/components/dashboard/DashboardStats";
 import DashboardChart, {
   type DashboardChartPoint,
-} from "@/components/DashboardChart";
+} from "@/components/dashboard/DashboardChart";
 
 const Dashboard: React.FC = () => {
   const panel = PANEL_CONFIG.dashboard;

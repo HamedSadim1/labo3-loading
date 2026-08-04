@@ -1,7 +1,7 @@
 import React from "react";
 import { LOADING_CONFIG, LOADING_UI_COPY, UI_COPY } from "@/constants";
-import Icon from "@/components/Icon";
-import type { IconName } from "@/components/Icon";
+import Icon from "@/components/shared/Icon";
+import type { IconName } from "@/components/shared/Icon";
 
 interface LoadingProgressProps {
   progress: number;

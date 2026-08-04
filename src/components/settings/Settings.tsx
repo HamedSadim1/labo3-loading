@@ -1,12 +1,12 @@
 import React from "react";
-import DialogPanel from "@/components/DialogPanel";
-import PanelTrigger from "@/components/PanelTrigger";
-import PanelHeader from "@/components/PanelHeader";
+import DialogPanel from "@/components/panels/DialogPanel";
+import PanelTrigger from "@/components/panels/PanelTrigger";
+import PanelHeader from "@/components/panels/PanelHeader";
 import { useApp } from "@/context/useApp";
 import type { LoadingStyle } from "@/constants";
 import { usePanelToggle } from "@/hooks/usePanelToggle";
-import PanelBody from "@/components/PanelBody";
-import Icon from "@/components/Icon";
+import PanelBody from "@/components/panels/PanelBody";
+import Icon from "@/components/shared/Icon";
 import { LOADING_CONFIG, PANEL_CONFIG, SETTINGS_CONFIG } from "@/constants";
 import { cn } from "@/utils/cn";
 

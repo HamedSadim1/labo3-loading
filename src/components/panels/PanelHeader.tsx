@@ -1,6 +1,6 @@
 import React from "react";
-import IconButton from "@/components/IconButton";
-import Icon from "@/components/Icon";
+import IconButton from "@/components/shared/IconButton";
+import Icon from "@/components/shared/Icon";
 import { PANEL_UI_COPY } from "@/constants";
 
 interface PanelHeaderProps {

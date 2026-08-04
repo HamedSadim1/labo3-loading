@@ -1,7 +1,7 @@
 import React from "react";
-import LoadingProgress from "@/components/LoadingProgress";
-import { LoadingStyleDisplay } from "@/components/LoadingStyles";
-import type { IconName } from "@/components/Icon";
+import LoadingProgress from "@/components/loading/LoadingProgress";
+import { LoadingStyleDisplay } from "@/components/loading/LoadingStyles";
+import type { IconName } from "@/components/shared/Icon";
 import { LOADING_UI_COPY } from "@/constants";
 
 interface LoadingActiveViewProps {

@@ -7,8 +7,8 @@ import {
   createDefaultLoadingState,
   getTotalLoadingDuration,
 } from "@/utils/loading";
-import LoadingActiveView from "@/components/LoadingActiveView";
-import LoadingIdleView from "@/components/LoadingIdleView";
+import LoadingActiveView from "@/components/loading/LoadingActiveView";
+import LoadingIdleView from "@/components/loading/LoadingIdleView";
 
 const Loading: React.FC = () => {
   const {

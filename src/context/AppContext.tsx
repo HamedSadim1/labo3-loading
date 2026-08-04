@@ -5,7 +5,7 @@ import React, {
   useRef,
   type ReactNode,
 } from "react";
-import Toast from "@/components/Toast";
+import Toast from "@/components/shared/Toast";
 import {
   APP_CONFIG,
   DEFAULT_LOADING_STYLE,

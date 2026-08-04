@@ -1,5 +1,5 @@
 import React from "react";
-import Icon from "@/components/Icon";
+import Icon from "@/components/shared/Icon";
 import { LOADING_UI_COPY } from "@/constants";
 
 interface LoadingIdleViewProps {
