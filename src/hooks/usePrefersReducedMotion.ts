@@ -1,15 +1,13 @@
 import { useEffect, useState } from "react";
-
-const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
-
-const getInitialPreference = (): boolean =>
-  typeof window !== "undefined" &&
-  typeof window.matchMedia === "function" &&
-  window.matchMedia(REDUCED_MOTION_QUERY).matches;
+import {
+  getPrefersReducedMotion,
+  REDUCED_MOTION_QUERY,
+} from "../utils/accessibility";
 
 export const usePrefersReducedMotion = (): boolean => {
-  const [prefersReducedMotion, setPrefersReducedMotion] =
-    useState(getInitialPreference);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(
+    getPrefersReducedMotion,
+  );
 
   useEffect(() => {
     if (typeof window === "undefined" || !window.matchMedia) return;

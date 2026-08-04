@@ -2,13 +2,11 @@ import React, { useCallback, useEffect, useRef } from "react";
 import { delay } from "../utils/delay";
 import { useApp } from "../context/useApp";
 import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion";
+import { DOM_IDS, LOADING_CONFIG, LOADING_UI_COPY } from "../constants";
 import {
-  DOM_IDS,
   createDefaultLoadingState,
-  LOADING_CONFIG,
-  LOADING_UI_COPY,
-  TOTAL_LOADING_DURATION,
-} from "../constants";
+  getTotalLoadingDuration,
+} from "../utils/loading";
 import LoadingActiveView from "./LoadingActiveView";
 import LoadingIdleView from "./LoadingIdleView";
 
@@ -82,7 +80,7 @@ const Loading: React.FC = () => {
           LOADING_CONFIG.progressSteps;
         const stageStart = elapsed;
         const stageStartProgress =
-          (stageStart / (TOTAL_LOADING_DURATION * durationMultiplier)) *
+          (stageStart / (getTotalLoadingDuration() * durationMultiplier)) *
           LOADING_CONFIG.progressScale;
         setLoadingState({
           status: "running",
@@ -94,11 +92,11 @@ const Loading: React.FC = () => {
           await delay(stepDuration, controller.signal);
           elapsed += stepDuration;
           const baseProgress =
-            (stageStart / (TOTAL_LOADING_DURATION * durationMultiplier)) *
+            (stageStart / (getTotalLoadingDuration() * durationMultiplier)) *
             LOADING_CONFIG.progressScale;
           const stageProgress =
             ((step + 1) / LOADING_CONFIG.progressSteps) *
-            (currentStage.duration / TOTAL_LOADING_DURATION) *
+            (currentStage.duration / getTotalLoadingDuration()) *
             LOADING_CONFIG.progressScale;
           setLoadingState({
             status: "running",

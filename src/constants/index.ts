@@ -149,20 +149,6 @@ export const LOADING_CONFIG = {
   },
 } as const;
 
-export const TOTAL_LOADING_DURATION = LOADING_CONFIG.stages.reduce(
-  (sum, stage) => sum + stage.duration,
-  0,
-);
-
-export const createDefaultLoadingState = (): LoadingState => ({
-  status: "idle",
-  stage: "idle",
-  progress: LOADING_CONFIG.initialProgress,
-});
-
-export const isLoadingStyle = (value: unknown): value is LoadingStyle =>
-  LOADING_CONFIG.styleOptions.some((option) => option.value === value);
-
 export const PANEL_CONFIG = {
   dashboard: {
     key: "dashboard",
@@ -205,13 +191,6 @@ export const STORAGE_CONFIG = {
   maxDurationMs: 24 * 60 * 60 * 1000,
 } as const;
 
-export const createDefaultMetrics = (): LoadingMetrics => ({
-  totalRuns: 0,
-  completedRuns: 0,
-  totalDurationMs: 0,
-  recentDurations: [],
-});
-
 export const DASHBOARD_CONFIG = {
   chartMinHeightPercent: 12,
   chartMaxHeightPercent: 100,
@@ -241,6 +220,11 @@ export const ANIMATION_CONFIG = {
   numberDurationMs: 550,
 } as const;
 
+export const NUMBER_FORMAT_CONFIG = {
+  locale: "nl-NL",
+  decimalPlaces: 1,
+} as const;
+
 export const DIALOG_CONFIG = {
   focusableSelector:
     'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [href], [contenteditable="true"], [tabindex]:not([tabindex="-1"])',
@@ -264,7 +248,6 @@ export const LOADING_UI_COPY = {
   completeMessage: "Klaar om opnieuw te starten",
   cancelButton: "Annuleren",
   defaultStageIcon: "refresh" as const,
-  percentSuffix: "%",
 } as const;
 
 export const PANEL_UI_COPY = {

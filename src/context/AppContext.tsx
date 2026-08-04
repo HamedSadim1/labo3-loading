@@ -8,9 +8,7 @@ import React, {
 import Toast from "../components/Toast";
 import {
   APP_CONFIG,
-  createDefaultLoadingState,
   DEFAULT_LOADING_STYLE,
-  createDefaultMetrics,
   STORAGE_CONFIG,
   DOM_IDS,
   ID_PREFIXES,
@@ -23,6 +21,8 @@ import type {
   Toast as ToastItem,
 } from "./types";
 import { createId } from "../utils/createId";
+import { createDefaultLoadingState } from "../utils/loading";
+import { clampDuration, createDefaultMetrics } from "../utils/metrics";
 import {
   readStoredSettings,
   writeStoredSettings,
@@ -102,10 +102,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   }, []);
 
   const recordLoadingComplete = useCallback((durationMs: number) => {
-    const safeDuration = Math.min(
-      Math.max(durationMs, 0),
-      STORAGE_CONFIG.maxDurationMs,
-    );
+    const safeDuration = clampDuration(durationMs);
     setMetrics((previous) => ({
       ...previous,
       completedRuns: previous.completedRuns + 1,

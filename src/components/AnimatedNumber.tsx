@@ -1,29 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
 import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion";
 import { ANIMATION_CONFIG } from "../constants";
-
-type NumberFormat = "integer" | "decimal" | "percent";
+import { formatNumber, type NumberFormat } from "../utils/formatters";
 
 interface AnimatedNumberProps {
   value: number;
   format?: NumberFormat;
   suffix?: string;
 }
-
-const formatValue = (
-  value: number,
-  format: NumberFormat,
-  suffix: string,
-): string => {
-  const formatted =
-    format === "decimal"
-      ? value.toFixed(1)
-      : format === "percent"
-        ? Math.round(value).toString()
-        : Math.round(value).toLocaleString("nl-NL");
-
-  return `${formatted}${suffix}`;
-};
 
 const AnimatedNumber: React.FC<AnimatedNumberProps> = ({
   value,
@@ -63,7 +47,7 @@ const AnimatedNumber: React.FC<AnimatedNumberProps> = ({
     return () => window.cancelAnimationFrame(frameId);
   }, [prefersReducedMotion, value]);
 
-  return <span>{formatValue(displayValue, format, suffix)}</span>;
+  return <span>{formatNumber(displayValue, format, suffix)}</span>;
 };
 
 export default AnimatedNumber;

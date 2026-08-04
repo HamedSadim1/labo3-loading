@@ -1,54 +1,13 @@
 import type { LoadingMetrics, LoadingStyle } from "../constants";
-import {
-  createDefaultMetrics,
-  isLoadingStyle,
-  STORAGE_CONFIG,
-} from "../constants";
+import { STORAGE_CONFIG } from "../constants";
+import { isLoadingStyle } from "./loading";
+import { normalizeMetrics } from "./metrics";
 
 export interface StoredSettings {
   version?: typeof STORAGE_CONFIG.version;
   loadingStyle?: LoadingStyle;
   metrics?: LoadingMetrics;
 }
-
-const normalizeMetrics = (value: unknown): LoadingMetrics => {
-  if (!value || typeof value !== "object") return createDefaultMetrics();
-  const metrics = value as Partial<LoadingMetrics>;
-  const totalRuns =
-    typeof metrics.totalRuns === "number" &&
-    Number.isInteger(metrics.totalRuns) &&
-    metrics.totalRuns >= 0
-      ? metrics.totalRuns
-      : 0;
-  const completedRuns =
-    typeof metrics.completedRuns === "number" &&
-    Number.isInteger(metrics.completedRuns) &&
-    metrics.completedRuns >= 0
-      ? Math.min(metrics.completedRuns, totalRuns)
-      : 0;
-  const totalDurationMs =
-    typeof metrics.totalDurationMs === "number" &&
-    Number.isFinite(metrics.totalDurationMs) &&
-    metrics.totalDurationMs >= 0
-      ? Math.min(
-          metrics.totalDurationMs,
-          STORAGE_CONFIG.maxDurationMs * STORAGE_CONFIG.maxRecentDurations,
-        )
-      : 0;
-  const recentDurations = Array.isArray(metrics.recentDurations)
-    ? metrics.recentDurations
-        .filter(
-          (duration): duration is number =>
-            typeof duration === "number" &&
-            Number.isFinite(duration) &&
-            duration >= 0 &&
-            duration <= STORAGE_CONFIG.maxDurationMs,
-        )
-        .slice(-STORAGE_CONFIG.maxRecentDurations)
-    : [];
-
-  return { totalRuns, completedRuns, totalDurationMs, recentDurations };
-};
 
 const normalizeStoredSettings = (value: unknown): StoredSettings => {
   if (!value || typeof value !== "object") return {};
