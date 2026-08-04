@@ -106,7 +106,7 @@ const Dashboard: React.FC = () => {
         titleId="dashboard-title"
         open={isOpen}
         onClose={closePanel}
-        className="sm:w-[480px] sm:max-w-[calc(100vw-2rem)]"
+        className="sm:w-120 sm:max-w-[calc(100vw-2rem)]"
       >
         <div className="flex items-center justify-between border-b border-white/10 bg-white/10 px-4 py-3 sm:px-6 sm:py-4">
           <div>

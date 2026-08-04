@@ -39,9 +39,9 @@ const PulseRing: React.FC = () => (
 );
 
 const ProgressBar: React.FC = () => (
-  <div className="w-full max-w-[200px] sm:max-w-xs" aria-hidden="true">
+  <div className="w-full max-w-50 sm:max-w-xs" aria-hidden="true">
     <div className="h-2.5 overflow-hidden rounded-full bg-white/10 sm:h-3">
-      <div className="h-full animate-[shimmer_2s_infinite] rounded-full bg-linear-to-r from-cyan-300 via-violet-400 to-fuchsia-400 bg-[length:200%_100%]" />
+      <div className="h-full animate-[shimmer_2s_infinite] rounded-full bg-linear-to-r from-cyan-300 via-violet-400 to-fuchsia-400 bg-size-[200%_100%]" />
     </div>
     <style>
       {

@@ -180,7 +180,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     <AppContext.Provider value={contextValue}>
       {children}
       <div
-        className="pointer-events-none fixed inset-x-4 bottom-4 z-[60] flex flex-col items-end gap-2 sm:left-auto sm:right-4 sm:max-w-sm"
+        className="pointer-events-none fixed inset-x-4 bottom-4 z-60 flex flex-col items-end gap-2 sm:left-auto sm:right-4 sm:max-w-sm"
         aria-live="polite"
       >
         {toasts.map((toast) => (

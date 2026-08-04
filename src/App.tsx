@@ -30,7 +30,7 @@ const AppContent: React.FC = () => {
         </div>
       </header>
 
-      <main className="relative z-10 flex min-h-[100svh] w-full items-center justify-center px-4 pb-8 pt-24 sm:px-6 sm:pb-12 sm:pt-28">
+      <main className="relative z-10 flex min-h-svh w-full items-center justify-center px-4 pb-8 pt-24 sm:px-6 sm:pb-12 sm:pt-28">
         <div className="w-full max-w-md">
           <GlassCard>
             <Header />
