@@ -60,15 +60,18 @@ const DialogPanel: React.FC<DialogPanelProps> = ({
     document.addEventListener("keydown", handleKeyDown);
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
-      const activeElement = document.activeElement;
-      if (panel?.contains(activeElement)) {
-        window.requestAnimationFrame(() => {
-          const nextDialog = document.querySelector('[role="dialog"]');
-          if (!nextDialog?.contains(document.activeElement)) {
-            previousFocusRef.current?.focus();
-          }
-        });
-      }
+      window.requestAnimationFrame(() => {
+        const nextDialog = document.querySelector('[role="dialog"]');
+        const previousFocus = previousFocusRef.current;
+        if (
+          !nextDialog &&
+          previousFocus?.isConnected &&
+          !previousFocus.hasAttribute("disabled") &&
+          !previousFocus.closest("[hidden]")
+        ) {
+          previousFocus.focus({ preventScroll: true });
+        }
+      });
     };
   }, [onClose, open]);
 

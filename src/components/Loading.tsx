@@ -100,7 +100,22 @@ const Loading: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [stage, setStage] = useState<LoadingStage>("idle");
   const [progress, setProgress] = useState(0);
+  const startButtonRef = useRef<HTMLButtonElement>(null);
+  const wasLoading = useRef(false);
   const runId = useRef(0);
+
+  useEffect(() => {
+    const completedRun = wasLoading.current && !loading;
+    wasLoading.current = loading;
+
+    if (
+      completedRun &&
+      startButtonRef.current &&
+      document.activeElement === document.body
+    ) {
+      startButtonRef.current.focus();
+    }
+  }, [loading]);
 
   useEffect(() => {
     return () => {
@@ -172,7 +187,10 @@ const Loading: React.FC = () => {
         Loading demo
       </h2>
       {loading ? (
-        <div className="space-y-5" role="status" aria-live="polite">
+        <div className="space-y-5">
+          <p className="sr-only" role="status" aria-live="polite">
+            {stage === "complete" ? "Laden voltooid" : currentStage?.label}
+          </p>
           <LoadingStyleDisplay style={loadingStyle} isActive />
           <div
             className="space-y-3"
@@ -212,6 +230,7 @@ const Loading: React.FC = () => {
       ) : (
         <div className="space-y-4">
           <button
+            ref={startButtonRef}
             type="button"
             onClick={handleLoading}
             className="group relative inline-flex w-full items-center justify-center overflow-hidden rounded-2xl bg-linear-to-r from-cyan-400 via-violet-500 to-fuchsia-500 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-violet-950/30 transition duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-cyan-950/40 focus:outline-none focus-visible:ring-4 focus-visible:ring-cyan-300/25 active:scale-[0.98] active:translate-y-0 sm:py-4"
