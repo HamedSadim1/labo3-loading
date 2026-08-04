@@ -6,8 +6,15 @@ import React, {
   type ReactNode,
 } from "react";
 import Toast from "../components/Toast";
-import { createDefaultLoadingState } from "../constants/loading";
-import { MAX_VISIBLE_TOASTS, TOAST_DISMISS_DELAY_MS } from "../constants/app";
+import {
+  APP_CONFIG,
+  createDefaultLoadingState,
+  DEFAULT_LOADING_STYLE,
+  createDefaultMetrics,
+  STORAGE_CONFIG,
+  DOM_IDS,
+  ID_PREFIXES,
+} from "../constants";
 import { AppContext, type AppContextType } from "./context";
 import type {
   ActivePanel,
@@ -17,9 +24,6 @@ import type {
 } from "./types";
 import { createId } from "../utils/createId";
 import {
-  DEFAULT_METRICS,
-  MAX_DURATION_MS,
-  MAX_RECENT_DURATIONS,
   readStoredSettings,
   writeStoredSettings,
 } from "../utils/settingsStorage";
@@ -31,12 +35,12 @@ interface AppProviderProps {
 export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [storedSettings] = useState(() => readStoredSettings());
   const [loadingStyle, setLoadingStyle] = useState(
-    storedSettings.loadingStyle ?? "fidget",
+    storedSettings.loadingStyle ?? DEFAULT_LOADING_STYLE,
   );
   const [loading, setLoadingState] = useState(createDefaultLoadingState);
   const [activePanel, setActivePanel] = useState<ActivePanel>(null);
   const [metrics, setMetrics] = useState<LoadingMetrics>(
-    storedSettings.metrics ?? DEFAULT_METRICS,
+    storedSettings.metrics ?? createDefaultMetrics(),
   );
   const [toasts, setToasts] = useState<ToastItem[]>([]);
   const toastTimers = useRef(new Map<string, number>());
@@ -74,14 +78,16 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
   const addToast = useCallback(
     (message: string, type: ToastType = "info") => {
-      const id = createId("toast");
+      const id = createId(ID_PREFIXES.toast);
       setToasts((previous) =>
-        [...previous, { id, message, type }].slice(-MAX_VISIBLE_TOASTS),
+        [...previous, { id, message, type }].slice(
+          -APP_CONFIG.toast.maxVisible,
+        ),
       );
 
       const timerId = window.setTimeout(
         () => dismissToast(id),
-        TOAST_DISMISS_DELAY_MS,
+        APP_CONFIG.toast.dismissDelayMs,
       );
       toastTimers.current.set(id, timerId);
     },
@@ -96,13 +102,16 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   }, []);
 
   const recordLoadingComplete = useCallback((durationMs: number) => {
-    const safeDuration = Math.min(Math.max(durationMs, 0), MAX_DURATION_MS);
+    const safeDuration = Math.min(
+      Math.max(durationMs, 0),
+      STORAGE_CONFIG.maxDurationMs,
+    );
     setMetrics((previous) => ({
       ...previous,
       completedRuns: previous.completedRuns + 1,
       totalDurationMs: previous.totalDurationMs + safeDuration,
       recentDurations: [...previous.recentDurations, safeDuration].slice(
-        -MAX_RECENT_DURATIONS,
+        -STORAGE_CONFIG.maxRecentDurations,
       ),
     }));
   }, []);
@@ -132,7 +141,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
   return (
     <AppContext.Provider value={contextValue}>
-      <div id="app-shell">{children}</div>
+      <div id={DOM_IDS.appShell}>{children}</div>
       <div className="pointer-events-none fixed inset-x-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-60 flex flex-col items-end gap-2 sm:left-auto sm:right-4 sm:max-w-sm">
         {toasts.map((toast) => (
           <div className="pointer-events-auto w-full" key={toast.id}>

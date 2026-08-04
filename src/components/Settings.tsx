@@ -3,24 +3,26 @@ import DialogPanel from "./DialogPanel";
 import PanelTrigger from "./PanelTrigger";
 import PanelHeader from "./PanelHeader";
 import { useApp } from "../context/useApp";
-import type { LoadingStyle } from "../context/types";
+import type { LoadingStyle } from "../constants";
 import { usePanelToggle } from "../hooks/usePanelToggle";
 import PanelBody from "./PanelBody";
 import Icon from "./Icon";
-import { LOADING_STYLE_OPTIONS } from "../constants/loadingStyles";
-import { PANEL_IDS, PANEL_KEYS } from "../constants/panels";
+import { LOADING_CONFIG, PANEL_CONFIG, SETTINGS_CONFIG } from "../constants";
 
 const Settings: React.FC = () => {
-  const panel = PANEL_IDS.settings;
+  const panel = PANEL_CONFIG.settings;
   const { loadingStyle, loading, setLoadingStyle, addToast } = useApp();
-  const { isOpen, toggle, close } = usePanelToggle(PANEL_KEYS.settings);
+  const { isOpen, toggle, close } = usePanelToggle(panel.key);
 
   const handleStyleChange = (style: LoadingStyle) => {
     setLoadingStyle(style);
-    const styleName = LOADING_STYLE_OPTIONS.find(
+    const styleName = LOADING_CONFIG.styleOptions.find(
       (item) => item.value === style,
     )?.label;
-    addToast(`Laadstijl gewijzigd naar ${styleName}`, "success");
+    addToast(
+      `${SETTINGS_CONFIG.styleChangedToastPrefix} ${styleName}`,
+      "success",
+    );
   };
 
   return (
@@ -53,14 +55,14 @@ const Settings: React.FC = () => {
         <PanelBody className="max-h-[calc(100dvh_-_10rem)] p-4 sm:max-h-[calc(100dvh_-_12rem)] sm:p-6">
           <fieldset disabled={loading.status === "running"}>
             <legend className="mb-3 text-sm font-medium text-white/85">
-              Laadstijl
+              {SETTINGS_CONFIG.styleLegend}
             </legend>
             <div
               className="space-y-2"
               role="radiogroup"
-              aria-label="Laadstijl kiezen"
+              aria-label={SETTINGS_CONFIG.styleGroupLabel}
             >
-              {LOADING_STYLE_OPTIONS.map((style) => (
+              {LOADING_CONFIG.styleOptions.map((style) => (
                 <button
                   type="button"
                   key={style.value}
@@ -71,17 +73,21 @@ const Settings: React.FC = () => {
                     if (event.key !== "ArrowDown" && event.key !== "ArrowUp")
                       return;
                     event.preventDefault();
-                    const currentIndex = LOADING_STYLE_OPTIONS.findIndex(
+                    const currentIndex = LOADING_CONFIG.styleOptions.findIndex(
                       (item) => item.value === style.value,
                     );
                     const offset = event.key === "ArrowDown" ? 1 : -1;
                     const nextIndex =
-                      (currentIndex + offset + LOADING_STYLE_OPTIONS.length) %
-                      LOADING_STYLE_OPTIONS.length;
-                    handleStyleChange(LOADING_STYLE_OPTIONS[nextIndex].value);
+                      (currentIndex +
+                        offset +
+                        LOADING_CONFIG.styleOptions.length) %
+                      LOADING_CONFIG.styleOptions.length;
+                    handleStyleChange(
+                      LOADING_CONFIG.styleOptions[nextIndex].value,
+                    );
                     event.currentTarget.parentElement
                       ?.querySelector<HTMLButtonElement>(
-                        `[data-style="${LOADING_STYLE_OPTIONS[nextIndex].value}"]`,
+                        `[data-style="${LOADING_CONFIG.styleOptions[nextIndex].value}"]`,
                       )
                       ?.focus();
                   }}
@@ -107,8 +113,7 @@ const Settings: React.FC = () => {
             </div>
           </fieldset>
           <p className="mt-5 text-sm leading-5 text-white/75">
-            Kies je favoriete laadstijl voor de demo. Tijdens het laden blijft
-            de huidige stijl actief.
+            {SETTINGS_CONFIG.description}
           </p>
         </PanelBody>
       </DialogPanel>

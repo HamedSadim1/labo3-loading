@@ -1,5 +1,6 @@
 import React from "react";
 import type { ToastType } from "../context/types";
+import { UI_COPY } from "../constants";
 
 interface ToastProps {
   message: string;
@@ -36,7 +37,7 @@ const Toast: React.FC<ToastProps> = ({ message, type, onClose }) => {
         type="button"
         onClick={onClose}
         className="min-h-11 min-w-11 rounded-lg p-1 text-current/80 transition hover:bg-white/10 hover:text-current focus:outline-none focus-visible:ring-2 focus-visible:ring-current/50"
-        aria-label="Melding sluiten"
+        aria-label={UI_COPY.dismissMessage}
       >
         <span aria-hidden="true">×</span>
       </button>

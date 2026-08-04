@@ -7,25 +7,19 @@ import { createId } from "../utils/createId";
 import PanelBody from "./PanelBody";
 import { usePanelToggle } from "../hooks/usePanelToggle";
 import Icon from "./Icon";
-import {
-  BOT_RESPONSES,
-  CHAT_RESPONSE_BASE_DELAY_MS,
-  CHAT_RESPONSE_VARIANCE_MS,
-  CHAT_WELCOME_MESSAGE,
-} from "../constants/chat";
-import { PANEL_IDS, PANEL_KEYS } from "../constants/panels";
+import { CHAT_CONFIG, ID_PREFIXES, PANEL_CONFIG } from "../constants";
 import ChatComposer from "./ChatComposer";
 import ChatMessageList, { type ChatMessage } from "./ChatMessageList";
 
 const Chat: React.FC = () => {
-  const panel = PANEL_IDS.chat;
-  const { isOpen, toggle, close } = usePanelToggle(PANEL_KEYS.chat);
+  const panel = PANEL_CONFIG.chat;
+  const { isOpen, toggle, close } = usePanelToggle(panel.key);
   const prefersReducedMotion = usePrefersReducedMotion();
   const isOpenRef = useRef(isOpen);
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
-      id: "welcome",
-      text: CHAT_WELCOME_MESSAGE,
+      id: ID_PREFIXES.welcomeMessage,
+      text: CHAT_CONFIG.welcomeMessage,
       sender: "bot",
       timestamp: new Date(),
     },
@@ -59,7 +53,7 @@ const Chat: React.FC = () => {
     if (!text || isTyping) return;
 
     const userMessage: ChatMessage = {
-      id: createId("message"),
+      id: createId(ID_PREFIXES.message),
       text,
       sender: "user",
       timestamp: new Date(),
@@ -72,8 +66,10 @@ const Chat: React.FC = () => {
     responseTimerRef.current = window.setTimeout(
       () => {
         const botResponse: ChatMessage = {
-          id: createId("message"),
-          text: BOT_RESPONSES[Math.floor(Math.random() * BOT_RESPONSES.length)],
+          id: createId(ID_PREFIXES.message),
+          text: CHAT_CONFIG.botResponses[
+            Math.floor(Math.random() * CHAT_CONFIG.botResponses.length)
+          ],
           sender: "bot",
           timestamp: new Date(),
         };
@@ -82,7 +78,8 @@ const Chat: React.FC = () => {
         setIsTyping(false);
         responseTimerRef.current = null;
       },
-      CHAT_RESPONSE_BASE_DELAY_MS + Math.random() * CHAT_RESPONSE_VARIANCE_MS,
+      CHAT_CONFIG.responseBaseDelayMs +
+        Math.random() * CHAT_CONFIG.responseVarianceMs,
     );
   };
 
@@ -91,7 +88,7 @@ const Chat: React.FC = () => {
       <PanelTrigger
         label={
           unreadCount
-            ? `${panel.label}, ${unreadCount} nieuwe berichten`
+            ? `${panel.label}, ${unreadCount} ${CHAT_CONFIG.unreadMessageSuffix}`
             : panel.label
         }
         controls={panel.panel}

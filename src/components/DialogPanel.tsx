@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
+import { DIALOG_CONFIG, DOM_IDS } from "../constants";
 
 interface DialogPanelProps {
   id: string;
@@ -24,7 +25,7 @@ const DialogPanel: React.FC<DialogPanelProps> = ({
   useEffect(() => {
     if (!open) return;
 
-    const appShell = document.getElementById("app-shell");
+    const appShell = document.getElementById(DOM_IDS.appShell);
     const previousAriaHidden = appShell?.getAttribute("aria-hidden") ?? null;
     const previousInert = appShell?.inert ?? false;
     previousFocusRef.current = document.activeElement as HTMLElement | null;
@@ -34,8 +35,7 @@ const DialogPanel: React.FC<DialogPanelProps> = ({
     }
 
     const panel = panelRef.current;
-    const focusableSelector =
-      'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [href], [contenteditable="true"], [tabindex]:not([tabindex="-1"])';
+    const focusableSelector = DIALOG_CONFIG.focusableSelector;
     const getFocusable = () =>
       panel
         ? Array.from(

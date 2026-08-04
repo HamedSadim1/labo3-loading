@@ -1,4 +1,5 @@
 import React from "react";
+import { CHAT_CONFIG } from "../constants";
 
 export interface ChatMessage {
   id: string;
@@ -18,7 +19,7 @@ const ChatMessageList: React.FC<ChatMessageListProps> = ({
   isTyping,
   messagesEndRef,
 }) => (
-  <ul className="space-y-3 sm:space-y-4" aria-label="Chatberichten">
+  <ul className="space-y-3 sm:space-y-4" aria-label={CHAT_CONFIG.messagesLabel}>
     {messages.map((message) => (
       <li
         key={message.id}
@@ -49,12 +50,17 @@ const ChatMessageList: React.FC<ChatMessageListProps> = ({
       <li className="flex justify-start">
         <div className="rounded-2xl border border-white/10 bg-white/10 px-4 py-3">
           <div className="flex gap-1" role="status">
-            <span className="sr-only">Chatbot typt</span>
-            {[0, 1, 2].map((index) => (
+            <span className="sr-only">{CHAT_CONFIG.typingLabel}</span>
+            {Array.from(
+              { length: CHAT_CONFIG.typingDotCount },
+              (_, index) => index,
+            ).map((index) => (
               <span
                 key={index}
                 className="h-2 w-2 motion-safe:animate-bounce rounded-full bg-white/60"
-                style={{ animationDelay: `${index * 150}ms` }}
+                style={{
+                  animationDelay: `${index * CHAT_CONFIG.typingDotDelayMs}ms`,
+                }}
                 aria-hidden="true"
               />
             ))}

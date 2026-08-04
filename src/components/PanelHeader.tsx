@@ -1,6 +1,7 @@
 import React from "react";
 import IconButton from "./IconButton";
 import Icon from "./Icon";
+import { PANEL_UI_COPY } from "../constants";
 
 interface PanelHeaderProps {
   title: string;
@@ -32,7 +33,7 @@ const PanelHeader: React.FC<PanelHeaderProps> = ({
         </div>
       </div>
       <IconButton
-        label="Sluiten"
+        label={PANEL_UI_COPY.closeButton}
         className="ml-3 shrink-0 sm:p-2"
         onClick={onClose}
       >

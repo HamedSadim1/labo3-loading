@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion";
+import { ANIMATION_CONFIG } from "../constants";
 
 type NumberFormat = "integer" | "decimal" | "percent";
 
@@ -43,12 +44,11 @@ const AnimatedNumber: React.FC<AnimatedNumberProps> = ({
     }
 
     const startedAt = performance.now();
-    const NUMBER_ANIMATION_DURATION_MS = 550;
     let frameId = 0;
 
     const animate = (now: number) => {
       const progress = Math.min(
-        (now - startedAt) / NUMBER_ANIMATION_DURATION_MS,
+        (now - startedAt) / ANIMATION_CONFIG.numberDurationMs,
         1,
       );
       const easedProgress = 1 - Math.pow(1 - progress, 3);

@@ -3,13 +3,12 @@ import { delay } from "../utils/delay";
 import { useApp } from "../context/useApp";
 import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion";
 import {
+  DOM_IDS,
   createDefaultLoadingState,
-  LOADING_COMPLETION_DELAY_MS,
-  LOADING_COPY,
-  LOADING_PROGRESS_STEPS,
-  LOADING_STAGES,
+  LOADING_CONFIG,
+  LOADING_UI_COPY,
   TOTAL_LOADING_DURATION,
-} from "../constants/loading";
+} from "../constants";
 import LoadingActiveView from "./LoadingActiveView";
 import LoadingIdleView from "./LoadingIdleView";
 
@@ -53,7 +52,7 @@ const Loading: React.FC = () => {
     isRunningRef.current = false;
     restoreFocusRef.current = true;
     setLoadingState(createDefaultLoadingState());
-    addToast(LOADING_COPY.cancelled, "warning");
+    addToast(LOADING_CONFIG.copy.cancelled, "warning");
   }, [addToast, setLoadingState]);
 
   const handleLoading = useCallback(async () => {
@@ -63,54 +62,70 @@ const Loading: React.FC = () => {
     const controller = new AbortController();
     controllerRef.current = controller;
     const startedAt = performance.now();
-    const durationMultiplier = prefersReducedMotion ? 0.1 : 1;
+    const durationMultiplier = prefersReducedMotion
+      ? LOADING_CONFIG.reducedMotionMultiplier
+      : LOADING_CONFIG.normalMotionMultiplier;
 
-    setLoadingState({ status: "running", stage: "initializing", progress: 0 });
+    setLoadingState({
+      status: "running",
+      stage: LOADING_CONFIG.initialStage,
+      progress: LOADING_CONFIG.initialProgress,
+    });
     recordLoadingStart();
-    addToast(LOADING_COPY.started, "info");
+    addToast(LOADING_CONFIG.copy.started, "info");
 
     try {
       let elapsed = 0;
-      for (const currentStage of LOADING_STAGES) {
+      for (const currentStage of LOADING_CONFIG.stages) {
         const stepDuration =
-          (currentStage.duration * durationMultiplier) / LOADING_PROGRESS_STEPS;
+          (currentStage.duration * durationMultiplier) /
+          LOADING_CONFIG.progressSteps;
         const stageStart = elapsed;
         const stageStartProgress =
-          (stageStart / (TOTAL_LOADING_DURATION * durationMultiplier)) * 100;
+          (stageStart / (TOTAL_LOADING_DURATION * durationMultiplier)) *
+          LOADING_CONFIG.progressScale;
         setLoadingState({
           status: "running",
           stage: currentStage.stageKey,
           progress: stageStartProgress,
         });
 
-        for (let step = 0; step < LOADING_PROGRESS_STEPS; step += 1) {
+        for (let step = 0; step < LOADING_CONFIG.progressSteps; step += 1) {
           await delay(stepDuration, controller.signal);
           elapsed += stepDuration;
           const baseProgress =
-            (stageStart / (TOTAL_LOADING_DURATION * durationMultiplier)) * 100;
+            (stageStart / (TOTAL_LOADING_DURATION * durationMultiplier)) *
+            LOADING_CONFIG.progressScale;
           const stageProgress =
-            ((step + 1) / LOADING_PROGRESS_STEPS) *
+            ((step + 1) / LOADING_CONFIG.progressSteps) *
             (currentStage.duration / TOTAL_LOADING_DURATION) *
-            100;
+            LOADING_CONFIG.progressScale;
           setLoadingState({
             status: "running",
             stage: currentStage.stageKey,
-            progress: Math.min(baseProgress + stageProgress, 99),
+            progress: Math.min(
+              baseProgress + stageProgress,
+              LOADING_CONFIG.maxProgress,
+            ),
           });
         }
       }
 
-      setLoadingState({ status: "complete", stage: "complete", progress: 100 });
+      setLoadingState({
+        status: "complete",
+        stage: LOADING_CONFIG.completeStage,
+        progress: LOADING_CONFIG.completeProgress,
+      });
       recordLoadingComplete(performance.now() - startedAt);
-      addToast(LOADING_COPY.completed, "success");
+      addToast(LOADING_CONFIG.copy.completed, "success");
       await delay(
-        LOADING_COMPLETION_DELAY_MS * durationMultiplier,
+        LOADING_CONFIG.completionDelayMs * durationMultiplier,
         controller.signal,
       );
       setLoadingState(createDefaultLoadingState());
     } catch (error) {
       if (!(error instanceof DOMException && error.name === "AbortError")) {
-        addToast(LOADING_COPY.failed, "error");
+        addToast(LOADING_CONFIG.copy.failed, "error");
         setLoadingState(createDefaultLoadingState());
       }
     } finally {
@@ -125,28 +140,28 @@ const Loading: React.FC = () => {
     setLoadingState,
   ]);
 
-  const currentStage = LOADING_STAGES.find(
+  const currentStage = LOADING_CONFIG.stages.find(
     (item) => item.stageKey === loading.stage,
   );
   const currentStageLabel =
     loading.status === "complete"
-      ? LOADING_COPY.completeStatus
+      ? LOADING_CONFIG.copy.completeStatus
       : currentStage?.label;
 
   return (
     <section
       className="animate-slide-up [animation-delay:0.2s]"
-      aria-labelledby="loading-heading"
+      aria-labelledby={DOM_IDS.loadingHeading}
       aria-busy={loading.status === "running"}
     >
-      <h2 id="loading-heading" className="sr-only">
-        Laaddemo
+      <h2 id={DOM_IDS.loadingHeading} className="sr-only">
+        {LOADING_UI_COPY.heading}
       </h2>
       {loading.status !== "idle" ? (
         <>
           <p className="sr-only" role="status" aria-live="polite">
             {loading.status === "complete"
-              ? LOADING_COPY.completeStatus
+              ? LOADING_CONFIG.copy.completeStatus
               : currentStageLabel}
           </p>
           <LoadingActiveView

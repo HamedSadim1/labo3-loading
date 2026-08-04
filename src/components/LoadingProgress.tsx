@@ -1,4 +1,5 @@
 import React from "react";
+import { LOADING_CONFIG, LOADING_UI_COPY, UI_COPY } from "../constants";
 import Icon from "./Icon";
 import type { IconName } from "./Icon";
 
@@ -11,7 +12,7 @@ interface LoadingProgressProps {
 const LoadingProgress: React.FC<LoadingProgressProps> = ({
   progress,
   stageLabel,
-  stageIcon = "refresh",
+  stageIcon = LOADING_UI_COPY.defaultStageIcon,
 }) => {
   const roundedProgress = Math.round(progress);
 
@@ -22,12 +23,15 @@ const LoadingProgress: React.FC<LoadingProgressProps> = ({
         role="progressbar"
         aria-valuenow={roundedProgress}
         aria-valuemin={0}
-        aria-valuemax={100}
-        aria-label={`Laden: ${roundedProgress} procent`}
+        aria-valuemax={LOADING_CONFIG.completeProgress}
+        aria-label={`${LOADING_UI_COPY.progressAriaLabel}: ${roundedProgress} ${LOADING_UI_COPY.percentLabel}`}
       >
         <div className="flex items-center justify-between text-xs font-medium uppercase tracking-[0.16em] text-white/80">
-          <span>Voortgang</span>
-          <span className="font-mono text-cyan-200">{roundedProgress}%</span>
+          <span>{LOADING_UI_COPY.progressLabel}</span>
+          <span className="font-mono text-cyan-200">
+            {roundedProgress}
+            {UI_COPY.percentSuffix}
+          </span>
         </div>
         <div className="relative h-2 overflow-hidden rounded-full bg-white/10 ring-1 ring-inset ring-white/10">
           <div

@@ -1,4 +1,5 @@
 import React from "react";
+import { DASHBOARD_CONFIG } from "../constants";
 
 export interface DashboardChartPoint {
   duration: number;
@@ -18,9 +19,11 @@ const DashboardChart: React.FC<DashboardChartProps> = ({
   <figure className="mt-4 rounded-xl border border-white/10 bg-white/5 p-3 sm:mt-6 sm:p-4">
     <div className="mb-4 flex items-center justify-between">
       <figcaption className="text-sm font-medium text-white/85">
-        Recente sessies
+        {DASHBOARD_CONFIG.copy.recentSessions}
       </figcaption>
-      <span className="text-sm text-white/75">{recentRuns} runs</span>
+      <span className="text-sm text-white/75">
+        {recentRuns} {DASHBOARD_CONFIG.copy.runsSuffix}
+      </span>
     </div>
     {chartData.length ? (
       <>
@@ -39,25 +42,32 @@ const DashboardChart: React.FC<DashboardChartProps> = ({
           ))}
         </div>
         <table className="sr-only">
-          <caption>Laadtijd per recente sessie</caption>
+          <caption>{DASHBOARD_CONFIG.copy.tableCaption}</caption>
           <thead>
             <tr>
-              <th scope="col">Sessie</th>
-              <th scope="col">Duur</th>
+              <th scope="col">{DASHBOARD_CONFIG.copy.sessionHeader}</th>
+              <th scope="col">{DASHBOARD_CONFIG.copy.durationHeader}</th>
             </tr>
           </thead>
           <tbody>
             {chartData.map(({ duration, index }) => (
               <tr key={`table-${index}`}>
                 <th scope="row">{index + 1}</th>
-                <td>{(duration / 1000).toFixed(1)} seconden</td>
+                <td>
+                  {(duration / DASHBOARD_CONFIG.durationDivisorMs).toFixed(
+                    DASHBOARD_CONFIG.durationDecimalPlaces,
+                  )}{" "}
+                  {DASHBOARD_CONFIG.copy.secondsSuffix}
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </>
     ) : (
-      <p className="text-sm text-white/75">Nog geen sessies geregistreerd.</p>
+      <p className="text-sm text-white/75">
+        {DASHBOARD_CONFIG.copy.noSessions}
+      </p>
     )}
   </figure>
 );

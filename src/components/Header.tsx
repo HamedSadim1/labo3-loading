@@ -1,11 +1,14 @@
 import React from "react";
 import { useApp } from "../context/useApp";
-import { APP_DESCRIPTION, APP_TITLE, APP_VERSION } from "../constants/app";
+import { APP_CONFIG } from "../constants";
 import Icon from "./Icon";
 
 const Header: React.FC = () => {
   const { loading } = useApp();
-  const statusLabel = loading.status === "running" ? "Bezig" : "Klaar";
+  const statusLabel =
+    loading.status === "running"
+      ? APP_CONFIG.statusLabels.running
+      : APP_CONFIG.statusLabels.ready;
   const statusClass =
     loading.status === "running" ? "bg-amber-300" : "bg-cyan-300";
 
@@ -19,7 +22,7 @@ const Header: React.FC = () => {
           <span role="status">{statusLabel}</span>
         </div>
         <span className="text-xs font-medium uppercase tracking-[0.18em] text-white/75">
-          {APP_VERSION}
+          {APP_CONFIG.version}
         </span>
       </div>
 
@@ -29,11 +32,11 @@ const Header: React.FC = () => {
 
       <h1 className="text-4xl font-extrabold tracking-[-0.04em] text-white sm:text-5xl">
         <span className="bg-linear-to-r from-white via-cyan-100 to-violet-200 bg-clip-text text-transparent">
-          {APP_TITLE}
+          {APP_CONFIG.title}
         </span>
       </h1>
       <p className="mx-auto mt-3 max-w-xs text-sm leading-6 text-white/75 sm:text-base">
-        {APP_DESCRIPTION}
+        {APP_CONFIG.description}
       </p>
     </header>
   );

@@ -1,5 +1,6 @@
 import React from "react";
 import Icon from "./Icon";
+import { LOADING_UI_COPY } from "../constants";
 
 interface LoadingIdleViewProps {
   onStart: () => void;
@@ -23,11 +24,11 @@ const LoadingIdleView: React.FC<LoadingIdleViewProps> = ({
           name="play"
           className="h-5 w-5 transition-transform duration-300 group-hover:rotate-12 group-active:scale-90"
         />
-        Start laden
+        {LOADING_UI_COPY.startButton}
       </span>
     </button>
     <p className="text-center text-xs leading-5 text-white/75">
-      Kies een stijl via Instellingen en start de demo.
+      {LOADING_UI_COPY.idleDescription}
     </p>
   </div>
 );

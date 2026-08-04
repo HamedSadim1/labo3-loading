@@ -1,14 +1,11 @@
 import React from "react";
-import type { LoadingStyle } from "../context/types";
+import type { LoadingStyle } from "../constants";
+import { LOADING_CONFIG } from "../constants";
 
 interface LoadingStyleProps {
   style: LoadingStyle;
   isActive: boolean;
 }
-
-const BOUNCING_DOT_COUNT = 3;
-const WAVE_BAR_COUNT = 5;
-const WAVE_ANIMATION_DURATION = "0.9s";
 
 const FidgetSpinner: React.FC = () => (
   <div className="relative h-16 w-16 sm:h-20 sm:w-20" aria-hidden="true">
@@ -21,15 +18,18 @@ const FidgetSpinner: React.FC = () => (
 
 const BouncingDots: React.FC = () => (
   <div className="flex items-center gap-1.5 sm:gap-2" aria-hidden="true">
-    {Array.from({ length: BOUNCING_DOT_COUNT }, (_, index) => index).map(
-      (index) => (
-        <div
-          key={index}
-          className="h-3 w-3 animate-bounce rounded-full bg-linear-to-r from-cyan-300 to-violet-400 sm:h-4 sm:w-4"
-          style={{ animationDelay: `${index * 0.15}s` }}
-        />
-      ),
-    )}
+    {Array.from(
+      { length: LOADING_CONFIG.styleAnimation.bouncingDotCount },
+      (_, index) => index,
+    ).map((index) => (
+      <div
+        key={index}
+        className="h-3 w-3 animate-bounce rounded-full bg-linear-to-r from-cyan-300 to-violet-400 sm:h-4 sm:w-4"
+        style={{
+          animationDelay: `${index * LOADING_CONFIG.styleAnimation.bouncingDotDelayMs}ms`,
+        }}
+      />
+    ))}
   </div>
 );
 
@@ -65,18 +65,19 @@ const WaveBars: React.FC = () => (
     className="flex h-16 items-center justify-center gap-1.5 sm:h-20 sm:gap-2"
     aria-hidden="true"
   >
-    {Array.from({ length: WAVE_BAR_COUNT }, (_, index) => index).map(
-      (index) => (
-        <span
-          key={index}
-          className="h-8 w-1.5 animate-pulse rounded-full bg-linear-to-b from-cyan-300 via-violet-400 to-fuchsia-400 sm:w-2"
-          style={{
-            animationDelay: `${index * 0.12}s`,
-            animationDuration: WAVE_ANIMATION_DURATION,
-          }}
-        />
-      ),
-    )}
+    {Array.from(
+      { length: LOADING_CONFIG.styleAnimation.waveBarCount },
+      (_, index) => index,
+    ).map((index) => (
+      <span
+        key={index}
+        className="h-8 w-1.5 animate-pulse rounded-full bg-linear-to-b from-cyan-300 via-violet-400 to-fuchsia-400 sm:w-2"
+        style={{
+          animationDelay: `${index * LOADING_CONFIG.styleAnimation.waveBarDelayMs}ms`,
+          animationDuration: LOADING_CONFIG.styleAnimation.waveDuration,
+        }}
+      />
+    ))}
   </div>
 );
 

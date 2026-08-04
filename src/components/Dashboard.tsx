@@ -7,17 +7,14 @@ import { useApp } from "../context/useApp";
 import { usePanelToggle } from "../hooks/usePanelToggle";
 import PanelBody from "./PanelBody";
 import Icon from "./Icon";
-import { PANEL_IDS, PANEL_KEYS } from "../constants/panels";
+import { DASHBOARD_CONFIG, PANEL_CONFIG, UI_COPY } from "../constants";
 import DashboardStats, { type DashboardStat } from "./DashboardStats";
 import DashboardChart, { type DashboardChartPoint } from "./DashboardChart";
 
-const CHART_MIN_HEIGHT_PERCENT = 12;
-const CHART_SCALE_FACTOR = 35;
-
 const Dashboard: React.FC = () => {
-  const panel = PANEL_IDS.dashboard;
+  const panel = PANEL_CONFIG.dashboard;
   const { metrics } = useApp();
-  const { isOpen, toggle, close } = usePanelToggle(PANEL_KEYS.dashboard);
+  const { isOpen, toggle, close } = usePanelToggle(panel.key);
   const averageDuration = metrics.completedRuns
     ? metrics.totalDurationMs / metrics.completedRuns
     : 0;
@@ -25,38 +22,41 @@ const Dashboard: React.FC = () => {
 
   const stats: DashboardStat[] = [
     {
-      label: "Totaal laden",
+      label: DASHBOARD_CONFIG.copy.totalRuns,
       value: <AnimatedNumber value={metrics.totalRuns} />,
       icon: <Icon name="runs" className="h-5 w-5" />,
     },
     {
-      label: "Gemiddelde tijd",
+      label: DASHBOARD_CONFIG.copy.averageDuration,
       value: metrics.completedRuns ? (
         <AnimatedNumber
-          value={averageDuration / 1000}
+          value={averageDuration / DASHBOARD_CONFIG.durationDivisorMs}
           format="decimal"
-          suffix="s"
+          suffix={DASHBOARD_CONFIG.copy.durationSuffix}
         />
       ) : (
-        "—"
+        DASHBOARD_CONFIG.copy.noValue
       ),
       icon: <Icon name="clock" className="h-5 w-5" />,
     },
     {
-      label: "Succespercentage",
+      label: DASHBOARD_CONFIG.copy.successRate,
       value: metrics.totalRuns ? (
         <AnimatedNumber
-          value={(metrics.completedRuns / metrics.totalRuns) * 100}
+          value={
+            (metrics.completedRuns / metrics.totalRuns) *
+            DASHBOARD_CONFIG.percentageScale
+          }
           format="percent"
-          suffix="%"
+          suffix={UI_COPY.percentSuffix}
         />
       ) : (
-        "—"
+        DASHBOARD_CONFIG.copy.noValue
       ),
       icon: <Icon name="success" className="h-5 w-5" />,
     },
     {
-      label: "Recente runs",
+      label: DASHBOARD_CONFIG.copy.recentRuns,
       value: <AnimatedNumber value={recentRuns} />,
       icon: <Icon name="recent" className="h-5 w-5" />,
     },
@@ -67,11 +67,16 @@ const Dashboard: React.FC = () => {
         duration,
         index,
         height: Math.min(
-          100,
+          DASHBOARD_CONFIG.chartMaxHeightPercent,
           Math.max(
-            CHART_MIN_HEIGHT_PERCENT,
-            100 -
-              (duration / Math.max(1, averageDuration)) * CHART_SCALE_FACTOR,
+            DASHBOARD_CONFIG.chartMinHeightPercent,
+            DASHBOARD_CONFIG.chartMaxHeightPercent -
+              (duration /
+                Math.max(
+                  DASHBOARD_CONFIG.minimumAverageDurationMs,
+                  averageDuration,
+                )) *
+                DASHBOARD_CONFIG.chartScaleFactor,
           ),
         ),
       }))

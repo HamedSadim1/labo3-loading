@@ -1,19 +1,7 @@
 import React from "react";
+import type { IconName } from "../constants";
 
-export type IconName =
-  | "bolt"
-  | "bot"
-  | "chat"
-  | "clock"
-  | "close"
-  | "dashboard"
-  | "play"
-  | "refresh"
-  | "recent"
-  | "runs"
-  | "send"
-  | "settings"
-  | "success";
+export type { IconName };
 
 interface IconProps extends React.SVGProps<SVGSVGElement> {
   name: IconName;
