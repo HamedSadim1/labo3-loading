@@ -42,6 +42,7 @@
     "typecheck": "tsc --noEmit",
     "spellcheck": "cspell lint \"**\" --no-progress --no-summary",
     "knip": "knip",
+    "release": "npx --yes semantic-release@25.0.8",
     "commit": "cz",
     "prepare": "husky"
   },

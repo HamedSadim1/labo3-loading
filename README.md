@@ -55,7 +55,7 @@ De app toont een centraal paneel met een "Start Loading" knop. Klik op de knop o
 - `npm run format`: Formatteer alle bestanden met Prettier
 - `npm run format:check`: Controleer of alle bestanden geformatteerd zijn
 - `npm run typecheck`: Controleer de TypeScript-types
-- `npm run release`: Publiceer een nieuwe release met semantic-release
+- `npm run release`: Maak een GitHub Release met semantic-release
 
 ## 🛠️ Ontwikkeltools
 
@@ -63,7 +63,7 @@ De app toont een centraal paneel met een "Start Loading" knop. Klik op de knop o
 - **Prettier**: Automatische code formatting.
 - **commitlint**: Valideert commit messages volgens Conventional Commits.
 - **Husky + lint-staged**: Git hooks die linting en formatting draaien bij elke commit.
-- **semantic-release**: Automatische versiebeheer en releases op basis van Conventional Commits. Vereist een `GITHUB_TOKEN` (of `GH_TOKEN`) environment variabele.
+- **semantic-release**: Automatische GitHub Releases op basis van Conventional Commits. npm-publicatie is uitgeschakeld; CI gebruikt de ingebouwde `GITHUB_TOKEN`.
 
 Commit messages volgen het [Conventional Commits](https://www.conventionalcommits.org/) formaat, bijvoorbeeld:
 
@@ -75,7 +75,7 @@ git commit -m "chore: update dependencies"
 
 ## 🤖 CI/CD
 
-De [GitHub Actions workflow](.github/workflows/ci.yml) draait bij elke push en pull request lint, typecheck en build (de `verify` job). Bij een merge naar `main` draait daarna automatisch semantic-release (de `release` job), die een changelog bijwerkt, een versie bepaalt en een GitHub Release aanmaakt — maar alleen als alle checks geslaagd zijn. Hiervoor heeft de workflow alleen het automatische `GITHUB_TOKEN` nodig; er zijn geen extra secrets vereist.
+De [GitHub Actions workflow](.github/workflows/ci.yml) draait bij elke push en pull request lint, typecheck en build (de `verify` job). Bij een merge naar `main` draait daarna automatisch semantic-release (de `release` job), die op basis van Conventional Commits een GitHub Release aanmaakt. De npm-plugin is niet geconfigureerd omdat dit project geen npm-package publiceert. Hiervoor heeft de workflow alleen het automatische `GITHUB_TOKEN` nodig; er zijn geen npm-tokens of extra secrets vereist.
 
 ## 📁 Project Structuur
 

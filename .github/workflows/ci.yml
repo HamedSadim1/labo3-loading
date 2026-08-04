@@ -46,9 +46,7 @@ jobs:
     needs: verify
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     permissions:
-      contents: write # to be able to publish a GitHub release
-      issues: write # to be able to comment on released issues
-      pull-requests: write # to be able to comment on released pull requests
+      contents: write # to create GitHub releases and tags
     concurrency:
       group: release
       cancel-in-progress: false
@@ -69,6 +67,6 @@ jobs:
         run: npm ci
 
       - name: Semantic release
-        run: npx semantic-release
+        run: npm run release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
