@@ -7,6 +7,7 @@ import { useApp } from "../context/useApp";
 import { usePanelToggle } from "../hooks/usePanelToggle";
 import PanelBody from "./PanelBody";
 import Icon from "./Icon";
+import { PANEL_IDS, PANEL_KEYS } from "../constants/panels";
 
 interface StatCard {
   label: string;
@@ -15,8 +16,11 @@ interface StatCard {
 }
 
 const Dashboard: React.FC = () => {
+  const panel = PANEL_IDS.dashboard;
   const { metrics } = useApp();
-  const { isOpen, toggle, close } = usePanelToggle("dashboard");
+  const { isOpen, toggle, close } = usePanelToggle(PANEL_KEYS.dashboard);
+  const CHART_MIN_HEIGHT_PERCENT = 12;
+  const CHART_SCALE_FACTOR = 35;
   const averageDuration = metrics.completedRuns
     ? metrics.totalDurationMs / metrics.completedRuns
     : 0;
@@ -67,7 +71,11 @@ const Dashboard: React.FC = () => {
         index,
         height: Math.min(
           100,
-          Math.max(12, 100 - (duration / Math.max(1, averageDuration)) * 35),
+          Math.max(
+            CHART_MIN_HEIGHT_PERCENT,
+            100 -
+              (duration / Math.max(1, averageDuration)) * CHART_SCALE_FACTOR,
+          ),
         ),
       }))
     : [];
@@ -75,8 +83,8 @@ const Dashboard: React.FC = () => {
   return (
     <div className="relative">
       <PanelTrigger
-        label="Dashboard"
-        controls="dashboard-panel"
+        label={panel.label}
+        controls={panel.panel}
         isOpen={isOpen}
         onToggle={toggle}
       >
@@ -84,16 +92,16 @@ const Dashboard: React.FC = () => {
       </PanelTrigger>
 
       <DialogPanel
-        id="dashboard-panel"
-        titleId="dashboard-title"
+        id={panel.panel}
+        titleId={panel.title}
         open={isOpen}
         onClose={close}
         className="sm:w-120 sm:max-w-[calc(100vw-2rem)]"
       >
         <PanelHeader
-          title="Dashboard"
-          titleId="dashboard-title"
-          subtitle="Live gegevens uit je laadsessies"
+          title={panel.heading}
+          titleId={panel.title}
+          subtitle={panel.subtitle}
           onClose={close}
         />
 

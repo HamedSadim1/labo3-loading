@@ -43,11 +43,14 @@ const AnimatedNumber: React.FC<AnimatedNumberProps> = ({
     }
 
     const startedAt = performance.now();
-    const duration = 550;
+    const NUMBER_ANIMATION_DURATION_MS = 550;
     let frameId = 0;
 
     const animate = (now: number) => {
-      const progress = Math.min((now - startedAt) / duration, 1);
+      const progress = Math.min(
+        (now - startedAt) / NUMBER_ANIMATION_DURATION_MS,
+        1,
+      );
       const easedProgress = 1 - Math.pow(1 - progress, 3);
       const nextValue = startValue + (value - startValue) * easedProgress;
       displayValueRef.current = nextValue;

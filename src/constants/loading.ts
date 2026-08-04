@@ -1,6 +1,5 @@
 import type { IconName } from "../components/Icon";
-import type { LoadingStage } from "../context/types";
-
+import type { LoadingStage, LoadingState } from "../context/types";
 export interface LoadingStageConfig {
   label: string;
   duration: number;
@@ -8,7 +7,23 @@ export interface LoadingStageConfig {
   icon: IconName;
 }
 
+export const createDefaultLoadingState = (): LoadingState => ({
+  status: "idle",
+  stage: "idle",
+  progress: 0,
+});
+
+export const LOADING_COPY = {
+  cancelled: "Laden geannuleerd",
+  started: "Laden gestart",
+  completed: "Laden voltooid",
+  failed: "Laden mislukt. Probeer opnieuw.",
+  completeStatus: "Laden voltooid",
+} as const;
+
 const LOADING_DURATION_MULTIPLIER = 2.5;
+export const LOADING_PROGRESS_STEPS = 20;
+export const LOADING_COMPLETION_DELAY_MS = 1500;
 
 export const LOADING_STAGES: LoadingStageConfig[] = [
   {

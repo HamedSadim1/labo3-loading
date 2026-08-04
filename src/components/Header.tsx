@@ -1,6 +1,6 @@
 import React from "react";
 import { useApp } from "../context/useApp";
-import { APP_TITLE } from "../constants/app";
+import { APP_DESCRIPTION, APP_TITLE, APP_VERSION } from "../constants/app";
 import Icon from "./Icon";
 
 const Header: React.FC = () => {
@@ -19,7 +19,7 @@ const Header: React.FC = () => {
           <span role="status">{statusLabel}</span>
         </div>
         <span className="text-xs font-medium uppercase tracking-[0.18em] text-white/75">
-          v3.0
+          {APP_VERSION}
         </span>
       </div>
 
@@ -33,7 +33,7 @@ const Header: React.FC = () => {
         </span>
       </h1>
       <p className="mx-auto mt-3 max-w-xs text-sm leading-6 text-white/75 sm:text-base">
-        Een heldere, interactieve loading experience voor je labo-oefening.
+        {APP_DESCRIPTION}
       </p>
     </header>
   );

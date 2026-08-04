@@ -7,23 +7,17 @@ import type { LoadingStyle } from "../context/types";
 import { usePanelToggle } from "../hooks/usePanelToggle";
 import PanelBody from "./PanelBody";
 import Icon from "./Icon";
-
-const LOADING_STYLES: { value: LoadingStyle; label: string; icon: string }[] = [
-  { value: "fidget", label: "Fidget spinner", icon: "🔄" },
-  { value: "dots", label: "Stuiterende stippen", icon: "⚫" },
-  { value: "pulse", label: "Pulserende ring", icon: "⭕" },
-  { value: "bar", label: "Voortgangsbalk", icon: "📊" },
-  { value: "spinner", label: "Klassieke spinner", icon: "💫" },
-  { value: "wave", label: "Golfbalken", icon: "〰️" },
-];
+import { LOADING_STYLE_OPTIONS } from "../constants/loadingStyles";
+import { PANEL_IDS, PANEL_KEYS } from "../constants/panels";
 
 const Settings: React.FC = () => {
+  const panel = PANEL_IDS.settings;
   const { loadingStyle, loading, setLoadingStyle, addToast } = useApp();
-  const { isOpen, toggle, close } = usePanelToggle("settings");
+  const { isOpen, toggle, close } = usePanelToggle(PANEL_KEYS.settings);
 
   const handleStyleChange = (style: LoadingStyle) => {
     setLoadingStyle(style);
-    const styleName = LOADING_STYLES.find(
+    const styleName = LOADING_STYLE_OPTIONS.find(
       (item) => item.value === style,
     )?.label;
     addToast(`Laadstijl gewijzigd naar ${styleName}`, "success");
@@ -32,8 +26,8 @@ const Settings: React.FC = () => {
   return (
     <div className="relative">
       <PanelTrigger
-        label="Instellingen"
-        controls="settings-panel"
+        label={panel.label}
+        controls={panel.panel}
         isOpen={isOpen}
         onToggle={toggle}
       >
@@ -44,15 +38,15 @@ const Settings: React.FC = () => {
       </PanelTrigger>
 
       <DialogPanel
-        id="settings-panel"
-        titleId="settings-title"
+        id={panel.panel}
+        titleId={panel.title}
         open={isOpen}
         onClose={close}
         className="sm:w-80"
       >
         <PanelHeader
-          title="Instellingen"
-          titleId="settings-title"
+          title={panel.heading}
+          titleId={panel.title}
           onClose={close}
         />
 
@@ -66,7 +60,7 @@ const Settings: React.FC = () => {
               role="radiogroup"
               aria-label="Laadstijl kiezen"
             >
-              {LOADING_STYLES.map((style) => (
+              {LOADING_STYLE_OPTIONS.map((style) => (
                 <button
                   type="button"
                   key={style.value}
@@ -77,23 +71,23 @@ const Settings: React.FC = () => {
                     if (event.key !== "ArrowDown" && event.key !== "ArrowUp")
                       return;
                     event.preventDefault();
-                    const currentIndex = LOADING_STYLES.findIndex(
+                    const currentIndex = LOADING_STYLE_OPTIONS.findIndex(
                       (item) => item.value === style.value,
                     );
                     const offset = event.key === "ArrowDown" ? 1 : -1;
                     const nextIndex =
-                      (currentIndex + offset + LOADING_STYLES.length) %
-                      LOADING_STYLES.length;
-                    handleStyleChange(LOADING_STYLES[nextIndex].value);
+                      (currentIndex + offset + LOADING_STYLE_OPTIONS.length) %
+                      LOADING_STYLE_OPTIONS.length;
+                    handleStyleChange(LOADING_STYLE_OPTIONS[nextIndex].value);
                     event.currentTarget.parentElement
                       ?.querySelector<HTMLButtonElement>(
-                        `[data-style="${LOADING_STYLES[nextIndex].value}"]`,
+                        `[data-style="${LOADING_STYLE_OPTIONS[nextIndex].value}"]`,
                       )
                       ?.focus();
                   }}
                   data-style={style.value}
                   onClick={() => handleStyleChange(style.value)}
-                  className={`flex min-h-11 w-full items-center gap-3 rounded-xl border px-3 py-3 text-left transition duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/50 disabled:cursor-not-allowed disabled:opacity-60 ${
+                  className={`flex min-h-11 w-full items-center gap-3 rounded-xl border px-3 py-3 text-left transition duration-200 focus:outline-none brand-focus disabled:cursor-not-allowed disabled:opacity-60 ${
                     loadingStyle === style.value
                       ? "border-cyan-300/40 bg-cyan-300/10 text-white"
                       : "border-transparent bg-white/5 text-white/80 hover:bg-white/10 hover:text-white"

@@ -1,28 +1,23 @@
 import type { LoadingMetrics, LoadingStyle } from "../context/types";
+import { isLoadingStyle } from "../constants/loadingStyles";
+
+const STORAGE_VERSION = 1;
+const STORAGE_KEY = "labo3-loading-settings";
+const MAX_RECENT_DURATIONS = 12;
+const MAX_DURATION_MS = 24 * 60 * 60 * 1000;
 
 export interface StoredSettings {
-  version?: 1;
+  version?: typeof STORAGE_VERSION;
   loadingStyle?: LoadingStyle;
   metrics?: LoadingMetrics;
 }
 
-const STORAGE_KEY = "labo3-loading-settings";
-const MAX_RECENT_DURATIONS = 12;
-const MAX_DURATION_MS = 24 * 60 * 60 * 1000;
 export const DEFAULT_METRICS: LoadingMetrics = {
   totalRuns: 0,
   completedRuns: 0,
   totalDurationMs: 0,
   recentDurations: [],
 };
-
-const isLoadingStyle = (value: unknown): value is LoadingStyle =>
-  value === "fidget" ||
-  value === "dots" ||
-  value === "pulse" ||
-  value === "bar" ||
-  value === "spinner" ||
-  value === "wave";
 
 const normalizeMetrics = (value: unknown): LoadingMetrics => {
   if (!value || typeof value !== "object") return DEFAULT_METRICS;
@@ -68,7 +63,8 @@ const normalizeStoredSettings = (value: unknown): StoredSettings => {
   const candidate = value as Record<string, unknown>;
 
   return {
-    version: candidate.version === 1 ? 1 : undefined,
+    version:
+      candidate.version === STORAGE_VERSION ? STORAGE_VERSION : undefined,
     loadingStyle: isLoadingStyle(candidate.loadingStyle)
       ? candidate.loadingStyle
       : undefined,
@@ -93,7 +89,7 @@ export const writeStoredSettings = (settings: StoredSettings): void => {
   try {
     window.localStorage.setItem(
       STORAGE_KEY,
-      JSON.stringify({ version: 1, ...settings }),
+      JSON.stringify({ version: STORAGE_VERSION, ...settings }),
     );
   } catch {
     // Storage can be unavailable in private browsing or restricted iframes.

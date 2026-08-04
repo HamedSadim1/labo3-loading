@@ -2,6 +2,9 @@
 
 @theme {
   --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --color-brand-cyan: #22d3ee;
+  --color-brand-violet: #8b5cf6;
+  --color-brand-fuchsia: #d946ef;
   --animate-float: float 6s ease-in-out infinite;
   --animate-gradient: gradient 8s ease infinite;
   --animate-fade-in: fadeIn 0.45s ease-out both;
@@ -53,6 +56,20 @@ input {
 
 button {
   -webkit-tap-highlight-color: transparent;
+}
+
+@layer components {
+  .brand-gradient {
+    @apply bg-linear-to-r from-cyan-400 via-violet-500 to-fuchsia-500;
+  }
+
+  .brand-gradient-interactive {
+    @apply bg-linear-to-r from-cyan-400 via-violet-500 to-fuchsia-500 hover:from-cyan-300 hover:via-violet-400 hover:to-fuchsia-400;
+  }
+
+  .brand-focus {
+    @apply focus-visible:ring-2 focus-visible:ring-cyan-300/50;
+  }
 }
 
 @keyframes float {

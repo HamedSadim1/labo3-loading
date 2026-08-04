@@ -7,6 +7,13 @@ import { createId } from "../utils/createId";
 import PanelBody from "./PanelBody";
 import { usePanelToggle } from "../hooks/usePanelToggle";
 import Icon from "./Icon";
+import {
+  BOT_RESPONSES,
+  CHAT_RESPONSE_BASE_DELAY_MS,
+  CHAT_RESPONSE_VARIANCE_MS,
+  CHAT_WELCOME_MESSAGE,
+} from "../constants/chat";
+import { PANEL_IDS, PANEL_KEYS } from "../constants/panels";
 
 interface Message {
   id: string;
@@ -15,27 +22,15 @@ interface Message {
   timestamp: Date;
 }
 
-const BOT_RESPONSES = [
-  "Hoi! Hoe kan ik je helpen? 👋",
-  "Dat is een interessante vraag!",
-  "Laat me even denken... 🤔",
-  "Goed punt! Ik begrijp het.",
-  "Kun je dat uitleggen?",
-  "Bedankt voor je bericht! 🙏",
-  "Dat klopt helemaal!",
-  "Ik snap wat je bedoelt.",
-  "Laten we dat samen oplossen!",
-  "Geweldig idee! 💡",
-];
-
 const Chat: React.FC = () => {
-  const { isOpen, toggle, close } = usePanelToggle("chat");
+  const panel = PANEL_IDS.chat;
+  const { isOpen, toggle, close } = usePanelToggle(PANEL_KEYS.chat);
   const prefersReducedMotion = usePrefersReducedMotion();
   const isOpenRef = useRef(isOpen);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome",
-      text: "Hoi! Welkom bij de chat. Hoe kan ik je helpen?",
+      text: CHAT_WELCOME_MESSAGE,
       sender: "bot",
       timestamp: new Date(),
     },
@@ -92,15 +87,19 @@ const Chat: React.FC = () => {
         setIsTyping(false);
         responseTimerRef.current = null;
       },
-      1000 + Math.random() * 1000,
+      CHAT_RESPONSE_BASE_DELAY_MS + Math.random() * CHAT_RESPONSE_VARIANCE_MS,
     );
   };
 
   return (
     <div className="relative">
       <PanelTrigger
-        label={unreadCount ? `Chat, ${unreadCount} nieuwe berichten` : "Chat"}
-        controls="chat-panel"
+        label={
+          unreadCount
+            ? `${panel.label}, ${unreadCount} nieuwe berichten`
+            : panel.label
+        }
+        controls={panel.panel}
         isOpen={isOpen}
         onToggle={() => {
           isOpenRef.current = !isOpen;
@@ -118,16 +117,16 @@ const Chat: React.FC = () => {
       </PanelTrigger>
 
       <DialogPanel
-        id="chat-panel"
-        titleId="chat-title"
+        id={panel.panel}
+        titleId={panel.title}
         open={isOpen}
         onClose={close}
         className="flex h-[min(70dvh,30rem)] flex-col sm:h-96 sm:w-80"
       >
         <PanelHeader
-          title="Chatbot"
-          titleId="chat-title"
-          subtitle="Beschikbaar"
+          title={panel.heading}
+          titleId={panel.title}
+          subtitle={panel.subtitle}
           onClose={close}
           leading={
             <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-linear-to-r from-cyan-300 via-violet-400 to-fuchsia-400 sm:h-10 sm:w-10">
@@ -147,7 +146,7 @@ const Chat: React.FC = () => {
                 <div
                   className={`max-w-[85%] rounded-2xl px-3 py-2 sm:max-w-[80%] sm:px-4 ${
                     message.sender === "user"
-                      ? "bg-linear-to-r from-cyan-400 via-violet-500 to-fuchsia-500 text-white"
+                      ? "brand-gradient text-white"
                       : "border border-white/10 bg-white/10 text-white"
                   }`}
                 >
@@ -208,7 +207,7 @@ const Chat: React.FC = () => {
             <button
               type="submit"
               disabled={!inputValue.trim() || isTyping}
-              className="min-h-11 min-w-11 rounded-xl bg-linear-to-r from-cyan-400 via-violet-500 to-fuchsia-500 p-2 text-white transition hover:from-cyan-300 hover:via-violet-400 hover:to-fuchsia-400 disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/50 active:scale-[0.97]"
+              className="min-h-11 min-w-11 rounded-xl brand-gradient-interactive p-2 text-white transition disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/50 active:scale-[0.97]"
               aria-label="Bericht versturen"
             >
               <Icon name="send" className="h-4 w-4 sm:h-5 sm:w-5" />

@@ -4,12 +4,16 @@ import { useApp } from "../context/useApp";
 import { LoadingStyleDisplay } from "./LoadingStyles";
 import Icon from "./Icon";
 import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion";
-import { LOADING_STAGES, TOTAL_LOADING_DURATION } from "../constants/loading";
+import {
+  createDefaultLoadingState,
+  LOADING_COMPLETION_DELAY_MS,
+  LOADING_COPY,
+  LOADING_PROGRESS_STEPS,
+  LOADING_STAGES,
+  TOTAL_LOADING_DURATION,
+} from "../constants/loading";
 
 const STAGES = LOADING_STAGES;
-
-/* Stage data lives in constants/loading.ts so this component only handles workflow state. */
-/* The remaining local alias keeps the progress algorithm readable. */
 const TOTAL_DURATION = TOTAL_LOADING_DURATION;
 
 const Loading: React.FC = () => {
@@ -51,8 +55,8 @@ const Loading: React.FC = () => {
     controllerRef.current = null;
     isRunningRef.current = false;
     restoreFocusRef.current = true;
-    setLoadingState({ status: "idle", stage: "idle", progress: 0 });
-    addToast("Laden geannuleerd", "warning");
+    setLoadingState(createDefaultLoadingState());
+    addToast(LOADING_COPY.cancelled, "warning");
   }, [addToast, setLoadingState]);
 
   const handleLoading = useCallback(async () => {
@@ -66,12 +70,12 @@ const Loading: React.FC = () => {
 
     setLoadingState({ status: "running", stage: "initializing", progress: 0 });
     recordLoadingStart();
-    addToast("Laden gestart", "info");
+    addToast(LOADING_COPY.started, "info");
 
     try {
       let elapsed = 0;
       for (const currentStage of STAGES) {
-        const steps = 20;
+        const steps = LOADING_PROGRESS_STEPS;
         const stepDuration =
           (currentStage.duration * durationMultiplier) / steps;
         const stageStart = elapsed;
@@ -102,13 +106,16 @@ const Loading: React.FC = () => {
 
       setLoadingState({ status: "complete", stage: "complete", progress: 100 });
       recordLoadingComplete(performance.now() - startedAt);
-      addToast("Laden voltooid", "success");
-      await delay(1500 * durationMultiplier, controller.signal);
-      setLoadingState({ status: "idle", stage: "idle", progress: 0 });
+      addToast(LOADING_COPY.completed, "success");
+      await delay(
+        LOADING_COMPLETION_DELAY_MS * durationMultiplier,
+        controller.signal,
+      );
+      setLoadingState(createDefaultLoadingState());
     } catch (error) {
       if (!(error instanceof DOMException && error.name === "AbortError")) {
-        addToast("Laden mislukt. Probeer opnieuw.", "error");
-        setLoadingState({ status: "idle", stage: "idle", progress: 0 });
+        addToast(LOADING_COPY.failed, "error");
+        setLoadingState(createDefaultLoadingState());
       }
     } finally {
       if (controllerRef.current === controller) controllerRef.current = null;
@@ -124,7 +131,9 @@ const Loading: React.FC = () => {
 
   const currentStage = STAGES.find((item) => item.stageKey === loading.stage);
   const currentStageLabel =
-    loading.status === "complete" ? "Voltooid" : currentStage?.label;
+    loading.status === "complete"
+      ? LOADING_COPY.completeStatus
+      : currentStage?.label;
 
   return (
     <section
@@ -139,7 +148,7 @@ const Loading: React.FC = () => {
         <div className="space-y-5">
           <p className="sr-only" role="status" aria-live="polite">
             {loading.status === "complete"
-              ? "Laden voltooid"
+              ? LOADING_COPY.completeStatus
               : currentStageLabel}
           </p>
           <LoadingStyleDisplay style={loadingStyle} isActive />
@@ -184,7 +193,7 @@ const Loading: React.FC = () => {
             <button
               type="button"
               onClick={cancelLoading}
-              className="mx-auto block rounded-xl border border-white/20 px-4 py-2 text-sm font-medium text-white/85 transition hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/50"
+              className="mx-auto block rounded-xl border border-white/20 px-4 py-2 text-sm font-medium text-white/85 transition hover:bg-white/10 focus:outline-none brand-focus"
             >
               Annuleren
             </button>
@@ -196,7 +205,7 @@ const Loading: React.FC = () => {
             ref={startButtonRef}
             type="button"
             onClick={handleLoading}
-            className="group relative inline-flex w-full items-center justify-center overflow-hidden rounded-2xl bg-linear-to-r from-cyan-400 via-violet-500 to-fuchsia-500 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-violet-950/30 transition duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-cyan-950/40 focus:outline-none focus-visible:ring-4 focus-visible:ring-cyan-300/25 active:scale-[0.98] active:translate-y-0 sm:py-4"
+            className="group relative inline-flex w-full items-center justify-center overflow-hidden rounded-2xl brand-gradient px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-violet-950/30 transition duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-cyan-950/40 focus:outline-none focus-visible:ring-4 focus-visible:ring-cyan-300/25 active:scale-[0.98] active:translate-y-0 sm:py-4"
           >
             <span className="pointer-events-none absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/40 to-transparent transition-transform duration-1000 ease-in-out group-hover:translate-x-full group-focus-visible:translate-x-full" />
             <span className="relative flex items-center justify-center gap-2.5">

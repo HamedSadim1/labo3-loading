@@ -6,11 +6,12 @@ import React, {
   type ReactNode,
 } from "react";
 import Toast from "../components/Toast";
+import { createDefaultLoadingState } from "../constants/loading";
+import { MAX_VISIBLE_TOASTS, TOAST_DISMISS_DELAY_MS } from "../constants/app";
 import { AppContext, type AppContextType } from "./context";
 import type {
   ActivePanel,
   LoadingMetrics,
-  LoadingState,
   ToastType,
   Toast as ToastItem,
 } from "./types";
@@ -27,17 +28,12 @@ interface AppProviderProps {
   children: ReactNode;
 }
 
-const DEFAULT_LOADING: LoadingState = {
-  status: "idle",
-  stage: "idle",
-  progress: 0,
-};
 export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [storedSettings] = useState(() => readStoredSettings());
   const [loadingStyle, setLoadingStyle] = useState(
     storedSettings.loadingStyle ?? "fidget",
   );
-  const [loading, setLoadingState] = useState<LoadingState>(DEFAULT_LOADING);
+  const [loading, setLoadingState] = useState(createDefaultLoadingState);
   const [activePanel, setActivePanel] = useState<ActivePanel>(null);
   const [metrics, setMetrics] = useState<LoadingMetrics>(
     storedSettings.metrics ?? DEFAULT_METRICS,
@@ -79,9 +75,14 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const addToast = useCallback(
     (message: string, type: ToastType = "info") => {
       const id = createId("toast");
-      setToasts((previous) => [...previous, { id, message, type }].slice(-3));
+      setToasts((previous) =>
+        [...previous, { id, message, type }].slice(-MAX_VISIBLE_TOASTS),
+      );
 
-      const timerId = window.setTimeout(() => dismissToast(id), 3200);
+      const timerId = window.setTimeout(
+        () => dismissToast(id),
+        TOAST_DISMISS_DELAY_MS,
+      );
       toastTimers.current.set(id, timerId);
     },
     [dismissToast],
