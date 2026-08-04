@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useApp } from "../context/AppContext";
+import React from "react";
+import { useApp } from "../context/useApp";
 import type { LoadingStyle } from "../context/types";
 
 const LOADING_STYLES: { value: LoadingStyle; label: string; icon: string }[] = [
@@ -11,8 +11,15 @@ const LOADING_STYLES: { value: LoadingStyle; label: string; icon: string }[] = [
 ];
 
 const Settings: React.FC = () => {
-  const { loadingStyle, setLoadingStyle, addToast } = useApp();
-  const [isOpen, setIsOpen] = useState(false);
+  const {
+    loadingStyle,
+    setLoadingStyle,
+    addToast,
+    activePanel,
+    openPanel,
+    closePanel,
+  } = useApp();
+  const isOpen = activePanel === "settings";
 
   const handleStyleChange = (style: LoadingStyle) => {
     setLoadingStyle(style);
@@ -24,7 +31,7 @@ const Settings: React.FC = () => {
     <div className="relative">
       {/* Settings Button */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => openPanel("settings")}
         className="group relative p-2.5 sm:p-3 rounded-xl bg-white/10 border border-white/20 text-white/70 hover:text-white hover:bg-white/20 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-white/30"
         aria-label="Instellingen"
         aria-expanded={isOpen}
@@ -52,14 +59,18 @@ const Settings: React.FC = () => {
 
       {/* Settings Panel - responsive */}
       {isOpen && (
-        <div className="absolute right-0 top-full mt-2 w-64 sm:w-72 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl p-4 sm:p-6 z-50 animate-fade-in">
+        <div
+          role="dialog"
+          aria-label="Instellingen"
+          className="fixed inset-x-3 top-20 z-50 max-h-[calc(100vh-6rem)] overflow-y-auto rounded-2xl border border-white/20 bg-slate-900/90 p-4 shadow-2xl backdrop-blur-xl animate-fade-in sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:w-72 sm:max-h-none sm:overflow-visible sm:bg-white/10 sm:p-6"
+        >
           {/* Header */}
           <div className="flex items-center justify-between mb-4 sm:mb-6">
             <h3 className="text-base sm:text-lg font-semibold text-white">
               Instellingen
             </h3>
             <button
-              onClick={() => setIsOpen(false)}
+              onClick={closePanel}
               className="p-1 rounded-lg hover:bg-white/10 text-white/60 hover:text-white transition-colors"
               aria-label="Sluiten"
             >

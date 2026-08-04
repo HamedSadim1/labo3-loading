@@ -3,15 +3,24 @@ import { APP_TITLE } from "../constants/app";
 
 const Header: React.FC = () => {
   return (
-    <div className="mb-8 animate-slide-up">
-      {/* Icon */}
-      <div className="mb-4 inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20">
+    <div className="mb-8 animate-slide-up sm:mb-10">
+      <div className="mb-5 flex items-center justify-between text-left">
+        <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-emerald-300">
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-300 shadow-[0_0_10px_rgba(110,231,183,0.9)]" />
+          Ready
+        </div>
+        <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-white/30">
+          v3.0
+        </span>
+      </div>
+
+      <div className="mb-5 inline-flex h-16 w-16 items-center justify-center rounded-2xl border border-cyan-300/20 bg-linear-to-br from-cyan-300/20 to-violet-400/20 text-cyan-100 shadow-lg shadow-cyan-950/20 sm:h-20 sm:w-20">
         <svg
-          className="w-8 h-8 text-white"
+          className="h-8 w-8 sm:h-10 sm:w-10"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
-          strokeWidth={2}
+          strokeWidth={1.7}
           aria-hidden="true"
         >
           <path
@@ -22,16 +31,13 @@ const Header: React.FC = () => {
         </svg>
       </div>
 
-      {/* Title */}
-      <h1 className="text-4xl sm:text-5xl font-extrabold text-white mb-3 tracking-tight">
-        <span className="bg-linear-to-r from-white via-blue-100 to-purple-200 bg-clip-text text-transparent">
+      <h1 className="text-4xl font-extrabold tracking-[-0.04em] text-white sm:text-5xl">
+        <span className="bg-linear-to-r from-white via-cyan-100 to-violet-200 bg-clip-text text-transparent">
           {APP_TITLE}
         </span>
       </h1>
-
-      {/* Subtitle */}
-      <p className="text-white/60 text-sm sm:text-base font-light tracking-wide">
-        Moderne laad-ervaring met stijl
+      <p className="mx-auto mt-3 max-w-xs text-sm leading-6 text-white/55 sm:text-base">
+        Een heldere, interactieve loading experience voor je labo-oefening.
       </p>
     </div>
   );

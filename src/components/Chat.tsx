@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useApp } from "../context/AppContext";
+import { useApp } from "../context/useApp";
 
 interface Message {
   id: number;
@@ -22,8 +22,8 @@ const BOT_RESPONSES = [
 ];
 
 const Chat: React.FC = () => {
-  const { addToast } = useApp();
-  const [isOpen, setIsOpen] = useState(false);
+  const { addToast, activePanel, openPanel, closePanel } = useApp();
+  const isOpen = activePanel === "chat";
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
@@ -35,6 +35,23 @@ const Chat: React.FC = () => {
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const responseTimerRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (responseTimerRef.current !== null) {
+        window.clearTimeout(responseTimerRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isOpen && responseTimerRef.current !== null) {
+      window.clearTimeout(responseTimerRef.current);
+      responseTimerRef.current = null;
+      setIsTyping(false);
+    }
+  }, [isOpen]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -44,8 +61,14 @@ const Chat: React.FC = () => {
     scrollToBottom();
   }, [messages]);
 
-  const handleSendMessage = async () => {
+  const handleSendMessage = () => {
     if (!inputValue.trim()) return;
+
+    if (responseTimerRef.current !== null) {
+      window.clearTimeout(responseTimerRef.current);
+      responseTimerRef.current = null;
+      setIsTyping(false);
+    }
 
     const userMessage: Message = {
       id: Date.now(),
@@ -58,7 +81,7 @@ const Chat: React.FC = () => {
     setInputValue("");
     setIsTyping(true);
 
-    setTimeout(
+    responseTimerRef.current = window.setTimeout(
       () => {
         const botResponse: Message = {
           id: Date.now() + 1,
@@ -68,6 +91,7 @@ const Chat: React.FC = () => {
         };
         setMessages((prev) => [...prev, botResponse]);
         setIsTyping(false);
+        responseTimerRef.current = null;
       },
       1000 + Math.random() * 1000,
     );
@@ -81,7 +105,7 @@ const Chat: React.FC = () => {
   };
 
   const handleOpen = () => {
-    setIsOpen(true);
+    openPanel("chat");
     if (messages.length <= 1) {
       addToast("Chat geopend", "info");
     }
@@ -111,13 +135,22 @@ const Chat: React.FC = () => {
         </svg>
         {/* Notification dot */}
         {messages.length > 1 && !isOpen && (
-          <div className="absolute -top-1 -right-1 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-pink-500 rounded-full animate-pulse" />
+          <span
+            className="absolute -top-1 -right-1 flex h-3 w-3 items-center justify-center rounded-full bg-pink-500 animate-pulse"
+            aria-label="Nieuwe berichten"
+          >
+            <span className="sr-only">Nieuwe berichten</span>
+          </span>
         )}
       </button>
 
       {/* Chat Window - responsive */}
       {isOpen && (
-        <div className="absolute right-0 bottom-full mb-2 w-[calc(100vw-2rem)] sm:w-80 h-[70vh] sm:h-96 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl overflow-hidden animate-slide-up flex flex-col">
+        <div
+          role="dialog"
+          aria-label="Chat"
+          className="fixed inset-x-3 top-20 z-50 flex h-[min(70vh,30rem)] flex-col overflow-hidden rounded-2xl border border-white/20 bg-slate-900/95 shadow-2xl backdrop-blur-xl animate-slide-up sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:bottom-auto sm:mt-2 sm:h-96 sm:w-80 sm:max-h-[calc(100vh-7rem)] sm:overflow-y-auto sm:bg-white/10"
+        >
           {/* Header */}
           <div className="bg-white/10 border-b border-white/10 px-3 sm:px-4 py-2.5 sm:py-3 flex-shrink-0">
             <div className="flex items-center justify-between">
@@ -148,7 +181,7 @@ const Chat: React.FC = () => {
                 </div>
               </div>
               <button
-                onClick={() => setIsOpen(false)}
+                onClick={closePanel}
                 className="p-1 rounded-lg hover:bg-white/10 text-white/60 hover:text-white transition-colors"
                 aria-label="Sluiten"
               >

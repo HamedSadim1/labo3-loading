@@ -1,181 +1,113 @@
 import React, { useState, useEffect } from "react";
-import { useApp } from "../context/AppContext";
+import { useApp } from "../context/useApp";
 
 interface StatCard {
   label: string;
   value: string;
-  change: string;
-  trend: "up" | "down";
   icon: React.ReactNode;
 }
 
 const Dashboard: React.FC = () => {
-  const { addToast } = useApp();
-  const [isOpen, setIsOpen] = useState(false);
+  const { metrics, activePanel, openPanel, closePanel, addToast } = useApp();
+  const isOpen = activePanel === "dashboard";
   const [animatedValues, setAnimatedValues] = useState<number[]>([0, 0, 0, 0]);
+  const averageDuration = metrics.completedRuns
+    ? metrics.totalDurationMs / metrics.completedRuns
+    : 0;
+  const recentRuns = metrics.recentDurations.length;
 
   const stats: StatCard[] = [
     {
       label: "Totaal Laden",
-      value: "1,234",
-      change: "+12.5%",
-      trend: "up",
-      icon: (
-        <svg
-          className="w-5 h-5 sm:w-6 sm:h-6"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M13 10V3L4 14h7v7l9-11h-7z"
-          />
-        </svg>
-      ),
+      value: metrics.totalRuns.toLocaleString("nl-NL"),
+      icon: <span aria-hidden="true">↯</span>,
     },
     {
       label: "Gem. Tijd",
-      value: "2.4s",
-      change: "-8.2%",
-      trend: "down",
-      icon: (
-        <svg
-          className="w-5 h-5 sm:w-6 sm:h-6"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
-      ),
+      value: metrics.completedRuns
+        ? `${(averageDuration / 1000).toFixed(1)}s`
+        : "—",
+      icon: <span aria-hidden="true">◷</span>,
     },
     {
       label: "Succes%",
-      value: "99.8%",
-      change: "+0.3%",
-      trend: "up",
-      icon: (
-        <svg
-          className="w-5 h-5 sm:w-6 sm:h-6"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
-      ),
+      value: metrics.totalRuns
+        ? `${Math.round((metrics.completedRuns / metrics.totalRuns) * 100)}%`
+        : "—",
+      icon: <span aria-hidden="true">✓</span>,
     },
     {
-      label: "Actief",
-      value: "89",
-      change: "+5.7%",
-      trend: "up",
-      icon: (
-        <svg
-          className="w-5 h-5 sm:w-6 sm:h-6"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-          />
-        </svg>
-      ),
+      label: "Recente runs",
+      value: recentRuns.toString(),
+      icon: <span aria-hidden="true">↗</span>,
     },
-  ];
-
-  const chartData = [65, 45, 75, 55, 80, 60, 90, 70, 85, 95, 75, 88];
-  const months = [
-    "Jan",
-    "Feb",
-    "Mrt",
-    "Apr",
-    "Mei",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Okt",
-    "Nov",
-    "Dec",
   ];
 
   useEffect(() => {
-    if (isOpen) {
-      const targetValues = [1234, 2.4, 99.8, 89];
-      const duration = 1000;
-      const steps = 30;
-      const stepDuration = duration / steps;
+    if (!isOpen) return;
 
-      let step = 0;
-      const interval = setInterval(() => {
-        step++;
-        const progress = step / steps;
-        const eased = 1 - Math.pow(1 - progress, 3);
+    const targets = [
+      metrics.totalRuns,
+      averageDuration / 1000,
+      metrics.totalRuns ? (metrics.completedRuns / metrics.totalRuns) * 100 : 0,
+      recentRuns,
+    ];
+    const steps = 30;
+    let step = 0;
+    const interval = window.setInterval(() => {
+      step += 1;
+      const progress = 1 - Math.pow(1 - step / steps, 3);
+      setAnimatedValues(
+        targets.map((target) => Math.round(target * progress * 10) / 10),
+      );
+      if (step >= steps) window.clearInterval(interval);
+    }, 1000 / steps);
 
-        setAnimatedValues(
-          targetValues.map((target) => {
-            if (target >= 100) {
-              return Math.round(target * eased);
-            }
-            return Math.round(target * eased * 10) / 10;
-          }),
-        );
-
-        if (step >= steps) {
-          clearInterval(interval);
-        }
-      }, stepDuration);
-
-      return () => clearInterval(interval);
-    }
-  }, [isOpen]);
+    return () => window.clearInterval(interval);
+  }, [
+    averageDuration,
+    isOpen,
+    metrics.completedRuns,
+    metrics.totalRuns,
+    recentRuns,
+  ]);
 
   const formatValue = (index: number, original: string) => {
-    if (original.includes("s")) return `${animatedValues[index]}s`;
-    if (original.includes("%")) return `${animatedValues[index]}%`;
-    if (original.includes(",")) {
-      return animatedValues[index].toLocaleString("nl-NL");
-    }
-    return animatedValues[index].toString();
+    if (original === "—") return original;
+    if (original.endsWith("s")) return `${animatedValues[index].toFixed(1)}s`;
+    if (original.endsWith("%")) return `${Math.round(animatedValues[index])}%`;
+    return Math.round(animatedValues[index]).toLocaleString("nl-NL");
   };
 
+  const chartData = metrics.recentDurations.length
+    ? metrics.recentDurations.map((duration) =>
+        Math.min(
+          100,
+          Math.max(12, 100 - (duration / Math.max(1, averageDuration)) * 35),
+        ),
+      )
+    : [20, 20, 20, 20, 20, 20];
+
   const handleOpen = () => {
-    setIsOpen(true);
+    openPanel("dashboard");
     addToast("Dashboard geopend", "info");
   };
 
   return (
     <div className="relative">
-      {/* Dashboard Toggle Button */}
       <button
+        type="button"
         onClick={handleOpen}
-        className="group relative p-2.5 sm:p-3 rounded-xl bg-white/10 border border-white/20 text-white/70 hover:text-white hover:bg-white/20 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-white/30"
+        className="group relative rounded-xl border border-white/15 bg-white/10 p-2.5 text-white/70 transition hover:bg-white/20 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/40"
         aria-label="Dashboard"
         aria-expanded={isOpen}
       >
         <svg
-          className="w-4 h-4 sm:w-5 sm:h-5"
+          className="h-4 w-4 sm:h-5 sm:w-5"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
+          aria-hidden="true"
         >
           <path
             strokeLinecap="round"
@@ -186,104 +118,78 @@ const Dashboard: React.FC = () => {
         </svg>
       </button>
 
-      {/* Dashboard Panel - responsive */}
       {isOpen && (
-        <div className="absolute right-0 bottom-full mb-2 w-[calc(100vw-2rem)] sm:w-[480px] max-w-[480px] bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl overflow-hidden animate-slide-up">
-          {/* Header */}
-          <div className="bg-white/10 border-b border-white/10 px-4 sm:px-6 py-3 sm:py-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-base sm:text-lg font-semibold text-white">
+        <div
+          role="dialog"
+          aria-label="Dashboard"
+          className="fixed inset-x-3 top-20 z-50 max-h-[calc(100vh-6rem)] overflow-y-auto rounded-2xl border border-white/20 bg-slate-900/95 shadow-2xl backdrop-blur-xl animate-slide-up sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:bottom-auto sm:mt-2 sm:w-[480px] sm:max-w-[calc(100vw-2rem)] sm:max-h-[calc(100vh-7rem)] sm:overflow-y-auto sm:bg-white/10"
+        >
+          <div className="flex items-center justify-between border-b border-white/10 bg-white/10 px-4 py-3 sm:px-6 sm:py-4">
+            <div>
+              <h3 className="text-base font-semibold text-white sm:text-lg">
                 Dashboard
               </h3>
-              <button
-                onClick={() => setIsOpen(false)}
-                className="p-1 rounded-lg hover:bg-white/10 text-white/60 hover:text-white transition-colors"
-                aria-label="Sluiten"
-              >
-                <svg
-                  className="w-4 h-4 sm:w-5 sm:h-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
+              <p className="mt-0.5 text-[10px] text-white/40 sm:text-xs">
+                Live data uit je loading-sessies
+              </p>
             </div>
+            <button
+              type="button"
+              onClick={closePanel}
+              className="rounded-lg p-1 text-white/60 transition hover:bg-white/10 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/40"
+              aria-label="Sluiten"
+            >
+              ×
+            </button>
           </div>
-
-          {/* Stats Grid - responsive */}
-          <div className="p-3 sm:p-6 grid grid-cols-2 gap-2 sm:gap-4">
+          <div className="grid grid-cols-2 gap-2 p-3 sm:gap-4 sm:p-6">
             {stats.map((stat, index) => (
               <div
                 key={stat.label}
-                className="bg-white/5 border border-white/10 rounded-xl p-3 sm:p-4 hover:bg-white/10 transition-all duration-300"
+                className="rounded-xl border border-white/10 bg-white/5 p-3 transition hover:bg-white/10 sm:p-4"
               >
-                <div className="flex items-center gap-2 sm:gap-3 mb-2">
-                  <div className="p-1.5 sm:p-2 rounded-lg bg-white/10 text-white/70">
+                <div className="mb-2 flex items-center gap-2 text-white/70 sm:gap-3">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/10 text-sm sm:h-10 sm:w-10">
                     {stat.icon}
                   </div>
-                  <span className="text-[10px] sm:text-xs text-white/50">
+                  <span className="text-[10px] text-white/50 sm:text-xs">
                     {stat.label}
                   </span>
                 </div>
-                <div className="flex items-end justify-between">
-                  <span className="text-lg sm:text-2xl font-bold text-white">
-                    {formatValue(index, stat.value)}
-                  </span>
-                  <span
-                    className={`text-[10px] sm:text-xs font-medium ${
-                      stat.trend === "up" ? "text-emerald-400" : "text-red-400"
-                    }`}
-                  >
-                    {stat.change}
-                  </span>
-                </div>
+                <span className="text-lg font-bold text-white sm:text-2xl">
+                  {formatValue(index, stat.value)}
+                </span>
               </div>
             ))}
           </div>
-
-          {/* Mini Chart */}
-          <div className="px-3 sm:px-6 pb-3 sm:pb-6">
-            <div className="bg-white/5 border border-white/10 rounded-xl p-3 sm:p-4">
-              <div className="flex items-center justify-between mb-3 sm:mb-4">
-                <span className="text-xs sm:text-sm font-medium text-white/70">
-                  Maandelijks Overzicht
+          <div className="px-3 pb-3 sm:px-6 sm:pb-6">
+            <div className="rounded-xl border border-white/10 bg-white/5 p-3 sm:p-4">
+              <div className="mb-3 flex items-center justify-between sm:mb-4">
+                <span className="text-xs font-medium text-white/70 sm:text-sm">
+                  Recente sessies
                 </span>
-                <span className="text-[10px] sm:text-xs text-white/40">
-                  2024
+                <span className="text-[10px] text-white/40 sm:text-xs">
+                  {recentRuns} runs
                 </span>
               </div>
-              <div className="flex items-end gap-0.5 sm:gap-1 h-16 sm:h-24">
+              <div className="flex h-20 items-end gap-1 sm:h-24">
                 {chartData.map((value, index) => (
                   <div
-                    key={index}
-                    className="flex-1 flex flex-col items-center gap-0.5 sm:gap-1"
+                    key={`${value}-${index}`}
+                    className="flex flex-1 flex-col items-center gap-1"
                   >
                     <div
-                      className="w-full bg-gradient-to-t from-blue-500 to-purple-500 rounded-t transition-all duration-500 hover:from-blue-400 hover:to-purple-400"
+                      className="w-full rounded-t bg-linear-to-t from-cyan-500 to-violet-400 transition hover:from-cyan-300 hover:to-violet-300"
                       style={{ height: `${value}%` }}
-                      title={`${months[index]}: ${value}%`}
+                      title={`Sessie ${index + 1}`}
                     />
-                    <span className="text-[6px] sm:text-[8px] text-white/40">
-                      {months[index]}
+                    <span className="text-[8px] text-white/35">
+                      {index + 1}
                     </span>
                   </div>
                 ))}
               </div>
             </div>
-          </div>
-
-          {/* Footer */}
-          <div className="border-t border-white/10 px-4 sm:px-6 py-2 sm:py-3">
-            <p className="text-[10px] sm:text-xs text-white/40 text-center">
-              Laatst bijgewerkt: {new Date().toLocaleTimeString("nl-NL")}
-            </p>
           </div>
         </div>
       )}

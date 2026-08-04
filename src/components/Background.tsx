@@ -6,20 +6,16 @@ interface BackgroundProps {
 
 const Background: React.FC<BackgroundProps> = ({ children }) => {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-linear-to-br from-blue-900 via-purple-900 to-indigo-900 flex items-center justify-center p-4">
-      {/* Animated gradient overlay */}
-      <div className="absolute inset-0 bg-linear-to-br from-blue-500/20 via-purple-500/20 to-pink-500/20 animate-gradient bg-[length:400%_400%]" />
+    <div className="relative min-h-screen overflow-x-hidden bg-slate-950 text-white selection:bg-cyan-300/30 selection:text-white">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(14,165,233,0.18),transparent_35%),radial-gradient(circle_at_80%_20%,rgba(168,85,247,0.16),transparent_32%),linear-gradient(135deg,#0f172a_0%,#1e1b4b_52%,#111827_100%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-linear-to-br from-cyan-400/5 via-transparent to-fuchsia-400/10 animate-gradient bg-size-[180%_180%]" />
 
-      {/* Floating orbs */}
-      <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-blue-400/30 rounded-full blur-3xl animate-float" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-400/20 rounded-full blur-3xl animate-float [animation-delay:-3s]" />
-      <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-pink-400/20 rounded-full blur-3xl animate-float [animation-delay:-1.5s]" />
+      <div className="pointer-events-none absolute -left-24 top-1/4 h-72 w-72 rounded-full bg-cyan-400/15 blur-3xl animate-float sm:h-96 sm:w-96" />
+      <div className="pointer-events-none absolute -right-24 bottom-1/4 h-80 w-80 rounded-full bg-fuchsia-400/15 blur-3xl animate-float [animation-delay:-3s] sm:h-112 sm:w-md" />
+      <div className="pointer-events-none absolute left-1/2 top-1/2 h-48 w-48 -translate-x-1/2 rounded-full bg-violet-400/10 blur-3xl animate-float [animation-delay:-1.5s] sm:h-64 sm:w-64" />
 
-      {/* Noise texture overlay */}
-      <div className="absolute inset-0 opacity-30 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii43NSIgc3RpdGNoVGlsZXM9InN0aXRjaCIgdHlwZT0iZnJhY3RhbE5vaXNlIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlcz0iMCIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbHRlcj0idXJsKCNhKSIgb3BhY2l0eT0iMC4wNSIvPjwvc3ZnPg==')] pointer-events-none" />
-
-      {/* Content */}
-      <div className="relative z-10 animate-fade-in">{children}</div>
+      <div className="pointer-events-none absolute inset-0 opacity-20 bg-[radial-gradient(rgba(255,255,255,0.45)_0.6px,transparent_0.6px)] bg-size-[18px_18px]" />
+      {children}
     </div>
   );
 };

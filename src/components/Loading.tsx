@@ -1,6 +1,6 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import { delay } from "../utils/delay";
-import { useApp } from "../context/AppContext";
+import { useApp } from "../context/useApp";
 import { LoadingStyleDisplay } from "./LoadingStyles";
 
 type LoadingStage =
@@ -20,16 +20,17 @@ const STAGES: StageConfig[] = [
     stageKey: "initializing",
     icon: (
       <svg
-        className="w-5 h-5"
+        className="h-5 w-5"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
+        aria-hidden="true"
       >
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeWidth={2}
-          d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+          d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
         />
         <path
           strokeLinecap="round"
@@ -46,10 +47,11 @@ const STAGES: StageConfig[] = [
     stageKey: "processing",
     icon: (
       <svg
-        className="w-5 h-5"
+        className="h-5 w-5"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
+        aria-hidden="true"
       >
         <path
           strokeLinecap="round"
@@ -66,10 +68,11 @@ const STAGES: StageConfig[] = [
     stageKey: "finalizing",
     icon: (
       <svg
-        className="w-5 h-5"
+        className="h-5 w-5"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
+        aria-hidden="true"
       >
         <path
           strokeLinecap="round"
@@ -82,159 +85,169 @@ const STAGES: StageConfig[] = [
   },
 ];
 
-const TOTAL_DURATION = STAGES.reduce((sum, s) => sum + s.duration, 0);
+const TOTAL_DURATION = STAGES.reduce((sum, stage) => sum + stage.duration, 0);
 
 const Loading: React.FC = () => {
-  const { loadingStyle, addToast } = useApp();
-  const [loading, setLoading] = useState<boolean>(false);
+  const {
+    loadingStyle,
+    addToast,
+    setIsLoading,
+    recordLoadingStart,
+    recordLoadingComplete,
+  } = useApp();
+  const [loading, setLoading] = useState(false);
   const [stage, setStage] = useState<LoadingStage>("idle");
-  const [progress, setProgress] = useState<number>(0);
+  const [progress, setProgress] = useState(0);
+  const runId = useRef(0);
+
+  useEffect(() => {
+    return () => {
+      runId.current += 1;
+      setIsLoading(false);
+    };
+  }, [setIsLoading]);
 
   const handleLoading = useCallback(async () => {
+    if (loading) return;
+
+    const currentRun = ++runId.current;
+    const startedAt = performance.now();
+    const isCurrentRun = () => runId.current === currentRun;
+
     setLoading(true);
+    setIsLoading(true);
+    recordLoadingStart();
     setProgress(0);
-    addToast("Loading gestart...", "info");
+    addToast("Loading gestart", "info");
 
     let elapsed = 0;
-    for (let i = 0; i < STAGES.length; i++) {
-      const s = STAGES[i];
-      setStage(s.stageKey);
-
-      const stageStart = elapsed;
-      const stageDuration = s.duration;
+    for (const currentStage of STAGES) {
+      if (!isCurrentRun()) return;
+      setStage(currentStage.stageKey);
       const steps = 20;
-      const stepDuration = stageDuration / steps;
+      const stepDuration = currentStage.duration / steps;
+      const stageStart = elapsed;
 
-      for (let j = 0; j < steps; j++) {
+      for (let step = 0; step < steps; step += 1) {
         await delay(stepDuration);
+        if (!isCurrentRun()) return;
         elapsed += stepDuration;
         const baseProgress = (stageStart / TOTAL_DURATION) * 100;
         const stageProgress =
-          ((j + 1) / steps) * (stageDuration / TOTAL_DURATION) * 100;
+          ((step + 1) / steps) * (currentStage.duration / TOTAL_DURATION) * 100;
         setProgress(Math.min(baseProgress + stageProgress, 99));
       }
     }
 
+    if (!isCurrentRun()) return;
     setProgress(100);
     setStage("complete");
-    addToast("Loading voltooid!", "success");
+    recordLoadingComplete(performance.now() - startedAt);
+    addToast("Loading voltooid", "success");
     await delay(1500);
 
+    if (!isCurrentRun()) return;
     setLoading(false);
+    setIsLoading(false);
     setStage("idle");
     setProgress(0);
-  }, [addToast]);
+  }, [
+    addToast,
+    loading,
+    recordLoadingComplete,
+    recordLoadingStart,
+    setIsLoading,
+  ]);
 
-  const currentStageConfig = STAGES.find((s) => s.stageKey === stage);
+  const currentStage = STAGES.find((item) => item.stageKey === stage);
 
   return (
-    <div className="flex flex-col items-center space-y-4 sm:space-y-6 animate-slide-up [animation-delay:0.2s]">
+    <section
+      className="animate-slide-up [animation-delay:0.2s]"
+      aria-labelledby="loading-heading"
+    >
+      <h2 id="loading-heading" className="sr-only">
+        Loading demo
+      </h2>
       {loading ? (
-        <div
-          className="w-full space-y-4 sm:space-y-6"
-          role="progressbar"
-          aria-valuenow={progress}
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-label={`Laden: ${Math.round(progress)}%`}
-        >
-          {/* Loading Style Display */}
-          <LoadingStyleDisplay style={loadingStyle} isActive={loading} />
+        <div className="space-y-5" role="status" aria-live="polite">
+          <LoadingStyleDisplay style={loadingStyle} isActive />
 
-          {/* Progress bar */}
-          {loadingStyle === "bar" ? null : (
-            <div className="relative h-2 bg-white/10 rounded-full overflow-hidden backdrop-blur-sm border border-white/10">
+          <div
+            className="space-y-3"
+            role="progressbar"
+            aria-valuenow={Math.round(progress)}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label={`Laden: ${Math.round(progress)} procent`}
+          >
+            <div className="flex items-center justify-between text-[11px] font-medium uppercase tracking-[0.16em] text-white/45">
+              <span>Progress</span>
+              <span className="font-mono text-cyan-200/80">
+                {Math.round(progress)}%
+              </span>
+            </div>
+            <div className="relative h-2 overflow-hidden rounded-full bg-white/10 ring-1 ring-inset ring-white/10">
               <div
-                className="absolute inset-y-0 left-0 bg-linear-to-r from-blue-400 via-purple-400 to-pink-400 rounded-full transition-all duration-200 ease-out"
+                className="absolute inset-y-0 left-0 rounded-full bg-linear-to-r from-cyan-300 via-violet-400 to-fuchsia-400 transition-[width] duration-200 ease-out"
                 style={{ width: `${progress}%` }}
               />
-              <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/30 to-transparent animate-gradient bg-[length:200%_100%]" />
+              <div className="absolute inset-0 animate-gradient bg-linear-to-r from-transparent via-white/30 to-transparent bg-size-[200%_100%]" />
             </div>
-          )}
-
-          {/* Stage info */}
-          <div className="flex items-center justify-center gap-2 sm:gap-3 text-white/90">
-            <div className="animate-spin-slow text-purple-300">
-              {currentStageConfig?.icon}
-            </div>
-            <span className="text-xs sm:text-sm font-medium tracking-wide">
-              {currentStageConfig?.label}
-            </span>
-            <span className="text-xs text-white/50 font-mono">
-              {Math.round(progress)}%
-            </span>
           </div>
 
-          {/* Completion state */}
+          <div className="flex items-center justify-center gap-2.5 text-sm text-white/75">
+            <span className="text-cyan-200">{currentStage?.icon}</span>
+            <span>{currentStage?.label}</span>
+          </div>
+
           {stage === "complete" && (
-            <div className="text-center animate-fade-in">
-              <div className="inline-flex items-center gap-2 text-emerald-300 bg-emerald-500/10 px-3 sm:px-4 py-2 rounded-full border border-emerald-500/20">
-                <svg
-                  className="w-4 h-4 sm:w-5 sm:h-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-                <span className="text-xs sm:text-sm font-medium">
-                  Voltooid!
-                </span>
+            <div className="flex justify-center animate-fade-in">
+              <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-4 py-2 text-sm font-medium text-emerald-300">
+                <span aria-hidden="true">✓</span>
+                Klaar om opnieuw te starten
               </div>
             </div>
           )}
         </div>
       ) : (
-        <button
-          onClick={handleLoading}
-          className="group relative px-6 sm:px-8 py-3 sm:py-4 text-white font-semibold rounded-2xl overflow-hidden transition-all duration-300 hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-white/20"
-          aria-label="Start loading procedure"
-        >
-          {/* Button background */}
-          <div className="absolute inset-0 bg-linear-to-r from-blue-500 via-purple-500 to-pink-500 transition-all duration-300" />
-          <div className="absolute inset-0 bg-linear-to-r from-blue-600 via-purple-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-          {/* Button shine effect */}
-          <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-
-          {/* Button content */}
-          <span className="relative z-10 flex items-center gap-2 sm:gap-3">
-            <svg
-              className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 group-hover:rotate-12"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
-              />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            Start Loading
-          </span>
-        </button>
+        <div className="space-y-4">
+          <button
+            type="button"
+            onClick={handleLoading}
+            className="group relative inline-flex w-full items-center justify-center overflow-hidden rounded-2xl bg-linear-to-r from-cyan-400 via-violet-500 to-fuchsia-500 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-violet-950/30 transition duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-violet-950/40 focus:outline-none focus-visible:ring-4 focus-visible:ring-cyan-300/25 active:translate-y-0 sm:py-4"
+          >
+            <span className="absolute inset-0 bg-white/20 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+            <span className="relative flex items-center justify-center gap-2.5">
+              <svg
+                className="h-5 w-5 transition-transform duration-300 group-hover:rotate-12"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              Start loading
+            </span>
+          </button>
+          <p className="text-center text-xs text-white/40">
+            Kies een stijl via instellingen en start de demo.
+          </p>
+        </div>
       )}
-
-      {/* Hint text */}
-      {!loading && (
-        <p className="text-white/40 text-xs animate-fade-in [animation-delay:0.4s]">
-          Klik om de loading procedure te starten
-        </p>
-      )}
-    </div>
+    </section>
   );
 };
 

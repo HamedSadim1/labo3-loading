@@ -6,62 +6,56 @@ interface LoadingStyleProps {
   isActive: boolean;
 }
 
-// Fidget Spinner Style
 const FidgetSpinner: React.FC = () => (
-  <div className="relative w-16 h-16 sm:w-20 sm:h-20">
-    <div className="absolute inset-0 border-4 border-white/20 rounded-full" />
-    <div className="absolute inset-0 border-4 border-transparent border-t-purple-400 rounded-full animate-spin" />
-    <div className="absolute inset-2 border-4 border-transparent border-t-blue-400 rounded-full animate-spin [animation-direction:reverse] [animation-duration:1.5s]" />
-    <div className="absolute inset-4 border-4 border-transparent border-t-pink-400 rounded-full animate-spin [animation-duration:0.8s]" />
+  <div className="relative h-16 w-16 sm:h-20 sm:w-20" aria-hidden="true">
+    <div className="absolute inset-0 rounded-full border-4 border-white/20" />
+    <div className="absolute inset-0 animate-spin rounded-full border-4 border-transparent border-t-violet-400" />
+    <div className="absolute inset-2 animate-spin rounded-full border-4 border-transparent border-t-cyan-400 [animation-direction:reverse] [animation-duration:1.5s]" />
+    <div className="absolute inset-4 animate-spin rounded-full border-4 border-transparent border-t-fuchsia-400 [animation-duration:0.8s]" />
   </div>
 );
 
-// Bouncing Dots Style
 const BouncingDots: React.FC = () => (
-  <div className="flex items-center gap-1.5 sm:gap-2">
-    {[0, 1, 2].map((i) => (
+  <div className="flex items-center gap-1.5 sm:gap-2" aria-hidden="true">
+    {[0, 1, 2].map((index) => (
       <div
-        key={i}
-        className="w-3 h-3 sm:w-4 sm:h-4 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full animate-bounce"
-        style={{ animationDelay: `${i * 0.15}s` }}
+        key={index}
+        className="h-3 w-3 animate-bounce rounded-full bg-linear-to-r from-cyan-300 to-violet-400 sm:h-4 sm:w-4"
+        style={{ animationDelay: `${index * 0.15}s` }}
       />
     ))}
   </div>
 );
 
-// Pulse Ring Style
 const PulseRing: React.FC = () => (
-  <div className="relative w-16 h-16 sm:w-20 sm:h-20">
-    <div className="absolute inset-0 border-4 border-purple-400/30 rounded-full animate-ping" />
-    <div className="absolute inset-2 border-4 border-blue-400/50 rounded-full animate-ping [animation-delay:0.5s]" />
-    <div className="absolute inset-4 border-4 border-pink-400/70 rounded-full animate-ping [animation-delay:1s]" />
+  <div className="relative h-16 w-16 sm:h-20 sm:w-20" aria-hidden="true">
+    <div className="absolute inset-0 animate-ping rounded-full border-4 border-violet-400/30" />
+    <div className="absolute inset-2 animate-ping rounded-full border-4 border-cyan-400/50 [animation-delay:0.5s]" />
+    <div className="absolute inset-4 animate-ping rounded-full border-4 border-fuchsia-400/70 [animation-delay:1s]" />
     <div className="absolute inset-0 flex items-center justify-center">
-      <div className="w-5 h-5 sm:w-6 sm:h-6 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full animate-pulse" />
+      <div className="h-5 w-5 animate-pulse rounded-full bg-linear-to-r from-cyan-300 to-violet-400 sm:h-6 sm:w-6" />
     </div>
   </div>
 );
 
-// Progress Bar Style
 const ProgressBar: React.FC = () => (
-  <div className="w-full max-w-[200px] sm:max-w-xs">
-    <div className="h-2.5 sm:h-3 bg-white/10 rounded-full overflow-hidden">
-      <div className="h-full bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 rounded-full animate-[shimmer_2s_infinite] bg-[length:200%_100%]" />
+  <div className="w-full max-w-[200px] sm:max-w-xs" aria-hidden="true">
+    <div className="h-2.5 overflow-hidden rounded-full bg-white/10 sm:h-3">
+      <div className="h-full animate-[shimmer_2s_infinite] rounded-full bg-linear-to-r from-cyan-300 via-violet-400 to-fuchsia-400 bg-[length:200%_100%]" />
     </div>
-    <style>{`
-      @keyframes shimmer {
-        0% { background-position: -200% 0; }
-        100% { background-position: 200% 0; }
+    <style>
+      {
+        "@keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }"
       }
-    `}</style>
+    </style>
   </div>
 );
 
-// Classic Spinner Style
 const ClassicSpinner: React.FC = () => (
-  <div className="relative w-12 h-12 sm:w-16 sm:h-16">
-    <div className="absolute inset-0 border-4 border-white/10 rounded-full" />
-    <div className="absolute inset-0 border-4 border-transparent border-t-blue-400 border-r-purple-400 rounded-full animate-spin" />
-    <div className="absolute inset-3 border-4 border-transparent border-b-pink-400 border-l-blue-400 rounded-full animate-spin [animation-direction:reverse] [animation-duration:1.5s]" />
+  <div className="relative h-12 w-12 sm:h-16 sm:w-16" aria-hidden="true">
+    <div className="absolute inset-0 rounded-full border-4 border-white/10" />
+    <div className="absolute inset-0 animate-spin rounded-full border-4 border-transparent border-r-violet-400 border-t-cyan-400" />
+    <div className="absolute inset-3 animate-spin rounded-full border-4 border-transparent border-b-fuchsia-400 border-l-cyan-400 [animation-direction:reverse] [animation-duration:1.5s]" />
   </div>
 );
 
@@ -85,5 +79,3 @@ export const LoadingStyleDisplay: React.FC<LoadingStyleProps> = ({
     </div>
   );
 };
-
-export default LoadingStyleDisplay;
