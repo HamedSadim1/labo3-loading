@@ -1,0 +1,4 @@
+{
+  "project": ["src/**/*.{ts,tsx,css}"],
+  "ignoreDependencies": ["@cspell/dict-nl-nl", "@semantic-release/github"]
+}

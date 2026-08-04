@@ -50,6 +50,32 @@ De app toont een centraal paneel met een "Start Loading" knop. Klik op de knop o
 - `npm run dev`: Start de development server
 - `npm run build`: Bouw de app voor productie
 - `npm run preview`: Preview de productie build lokaal
+- `npm run lint`: Controleer de code met ESLint
+- `npm run lint:fix`: Los ESLint-problemen automatisch op
+- `npm run format`: Formatteer alle bestanden met Prettier
+- `npm run format:check`: Controleer of alle bestanden geformatteerd zijn
+- `npm run typecheck`: Controleer de TypeScript-types
+- `npm run release`: Publiceer een nieuwe release met semantic-release
+
+## 🛠️ Ontwikkeltools
+
+- **ESLint**: Linting met TypeScript, React Hooks en React Refresh regels.
+- **Prettier**: Automatische code formatting.
+- **commitlint**: Valideert commit messages volgens Conventional Commits.
+- **Husky + lint-staged**: Git hooks die linting en formatting draaien bij elke commit.
+- **semantic-release**: Automatische versiebeheer en releases op basis van Conventional Commits. Vereist een `GITHUB_TOKEN` (of `GH_TOKEN`) environment variabele.
+
+Commit messages volgen het [Conventional Commits](https://www.conventionalcommits.org/) formaat, bijvoorbeeld:
+
+```bash
+git commit -m "feat: add loading animation"
+git commit -m "fix: correct spinner alignment"
+git commit -m "chore: update dependencies"
+```
+
+## 🤖 CI/CD
+
+De [GitHub Actions workflow](.github/workflows/ci.yml) draait bij elke push en pull request lint, typecheck en build (de `verify` job). Bij een merge naar `main` draait daarna automatisch semantic-release (de `release` job), die een changelog bijwerkt, een versie bepaalt en een GitHub Release aanmaakt — maar alleen als alle checks geslaagd zijn. Hiervoor heeft de workflow alleen het automatische `GITHUB_TOKEN` nodig; er zijn geen extra secrets vereist.
 
 ## 📁 Project Structuur
 
