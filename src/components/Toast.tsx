@@ -34,7 +34,7 @@ const Toast: React.FC<ToastProps> = ({ message, type, onClose }) => {
       <button
         type="button"
         onClick={onClose}
-        className="rounded-lg p-1 text-current/60 transition hover:bg-white/10 hover:text-current focus:outline-none focus-visible:ring-2 focus-visible:ring-current/50"
+        className="min-h-11 min-w-11 rounded-lg p-1 text-current/80 transition hover:bg-white/10 hover:text-current focus:outline-none focus-visible:ring-2 focus-visible:ring-current/50"
         aria-label="Melding sluiten"
       >
         <span aria-hidden="true">×</span>

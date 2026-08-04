@@ -77,11 +77,7 @@ const Settings: React.FC = () => {
           >
             Instellingen
           </h2>
-          <IconButton
-            label="Sluiten"
-            className="p-1.5 sm:p-2"
-            onClick={closePanel}
-          >
+          <IconButton label="Sluiten" className="sm:p-2" onClick={closePanel}>
             <svg
               className="h-4 w-4 sm:h-5 sm:w-5"
               fill="none"
@@ -116,7 +112,7 @@ const Settings: React.FC = () => {
                   className={`flex w-full items-center gap-3 rounded-xl border px-3 py-3 text-left transition duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/50 ${
                     loadingStyle === style.value
                       ? "border-cyan-300/40 bg-cyan-300/10 text-white"
-                      : "border-transparent bg-white/5 text-white/65 hover:bg-white/10 hover:text-white"
+                      : "border-transparent bg-white/5 text-white/80 hover:bg-white/10 hover:text-white"
                   }`}
                   aria-pressed={loadingStyle === style.value}
                 >
@@ -144,7 +140,7 @@ const Settings: React.FC = () => {
               ))}
             </div>
           </div>
-          <p className="text-xs leading-5 text-white/55">
+          <p className="text-xs leading-5 text-white/75">
             Kies je favoriete laadstijl voor de demo.
           </p>
         </div>

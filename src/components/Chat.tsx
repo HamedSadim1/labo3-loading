@@ -36,7 +36,7 @@ const Chat: React.FC = () => {
   ]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLLIElement>(null);
   const responseTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -84,13 +84,6 @@ const Chat: React.FC = () => {
       },
       1000 + Math.random() * 1000,
     );
-  };
-
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      handleSendMessage();
-    }
   };
 
   const handleOpen = () => {
@@ -164,14 +157,10 @@ const Chat: React.FC = () => {
               <h2 id="chat-title" className="text-sm font-semibold text-white">
                 Chat Bot
               </h2>
-              <p className="text-xs text-white/60">Online</p>
+              <p className="text-xs text-white/75">Online</p>
             </div>
           </div>
-          <IconButton
-            label="Sluiten"
-            className="p-1.5 sm:p-2"
-            onClick={closePanel}
-          >
+          <IconButton label="Sluiten" className="sm:p-2" onClick={closePanel}>
             <svg
               className="h-4 w-4 sm:h-5 sm:w-5"
               fill="none"
@@ -189,9 +178,12 @@ const Chat: React.FC = () => {
           </IconButton>
         </div>
 
-        <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-3 sm:space-y-4 sm:p-4">
+        <ul
+          className="min-h-0 flex-1 space-y-3 overflow-y-auto p-3 sm:space-y-4 sm:p-4"
+          aria-label="Chatberichten"
+        >
           {messages.map((message) => (
-            <div
+            <li
               key={message.id}
               className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}
             >
@@ -207,7 +199,7 @@ const Chat: React.FC = () => {
                   className={`mt-1 text-[11px] ${
                     message.sender === "user"
                       ? "text-white/75"
-                      : "text-white/55"
+                      : "text-white/75"
                   }`}
                 >
                   {message.timestamp.toLocaleTimeString("nl-NL", {
@@ -216,43 +208,52 @@ const Chat: React.FC = () => {
                   })}
                 </p>
               </div>
-            </div>
+            </li>
           ))}
 
           {isTyping && (
-            <div className="flex justify-start">
+            <li className="flex justify-start">
               <div className="rounded-2xl border border-white/10 bg-white/10 px-4 py-3">
-                <div className="flex gap-1" aria-label="Chat bot typt">
+                <div className="flex gap-1" role="status">
+                  <span className="sr-only">Chatbot typt</span>
                   {[0, 1, 2].map((index) => (
                     <span
                       key={index}
                       className="h-2 w-2 animate-bounce rounded-full bg-white/60"
                       style={{ animationDelay: `${index * 150}ms` }}
+                      aria-hidden="true"
                     />
                   ))}
                 </div>
               </div>
-            </div>
+            </li>
           )}
-          <div ref={messagesEndRef} />
-        </div>
+          <li ref={messagesEndRef} aria-hidden="true" />
+        </ul>
 
-        <div className="shrink-0 border-t border-white/10 p-3 sm:p-4">
+        <form
+          className="shrink-0 border-t border-white/10 p-3 sm:p-4"
+          onSubmit={(event) => {
+            event.preventDefault();
+            handleSendMessage();
+          }}
+        >
           <div className="flex gap-2">
+            <label htmlFor="chat-message" className="sr-only">
+              Bericht invoeren
+            </label>
             <input
               type="text"
               value={inputValue}
               onChange={(event) => setInputValue(event.target.value)}
-              onKeyDown={handleKeyDown}
+              id="chat-message"
               placeholder="Typ een bericht..."
-              className="min-w-0 flex-1 rounded-xl border border-white/20 bg-white/10 px-3 py-2 text-sm text-white placeholder-white/50 focus:border-cyan-300/50 focus:outline-none focus:ring-2 focus:ring-cyan-300/30"
-              aria-label="Bericht invoeren"
+              className="min-w-0 flex-1 rounded-xl border border-white/20 bg-white/10 px-3 py-2 text-base text-white placeholder-white/70 focus:border-cyan-300/50 focus:outline-none focus:ring-2 focus:ring-cyan-300/30 sm:text-sm"
             />
             <button
-              type="button"
-              onClick={handleSendMessage}
+              type="submit"
               disabled={!inputValue.trim() || isTyping}
-              className="rounded-xl bg-linear-to-r from-cyan-400 via-violet-500 to-fuchsia-500 p-2 text-white transition hover:from-cyan-300 hover:via-violet-400 hover:to-fuchsia-400 disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/50 active:scale-[0.97]"
+              className="min-h-11 min-w-11 rounded-xl bg-linear-to-r from-cyan-400 via-violet-500 to-fuchsia-500 p-2 text-white transition hover:from-cyan-300 hover:via-violet-400 hover:to-fuchsia-400 disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/50 active:scale-[0.97]"
               aria-label="Verstuur bericht"
             >
               <svg
@@ -271,7 +272,7 @@ const Chat: React.FC = () => {
               </svg>
             </button>
           </div>
-        </div>
+        </form>
       </DialogPanel>
     </div>
   );

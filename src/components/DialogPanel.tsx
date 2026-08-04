@@ -26,9 +26,18 @@ const DialogPanel: React.FC<DialogPanelProps> = ({
     previousFocusRef.current = document.activeElement as HTMLElement | null;
     const panel = panelRef.current;
     const focusableSelector =
-      'button:not([disabled]), input:not([disabled]), [href], [tabindex]:not([tabindex="-1"])';
-    const firstFocusable = panel?.querySelector<HTMLElement>(focusableSelector);
-    firstFocusable?.focus();
+      'button:not([disabled]):not([aria-hidden="true"]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [href], [contenteditable="true"], [tabindex]:not([tabindex="-1"])';
+    const getFocusable = () =>
+      panel
+        ? Array.from(
+            panel.querySelectorAll<HTMLElement>(focusableSelector),
+          ).filter(
+            (element) =>
+              !element.hasAttribute("hidden") &&
+              element.getClientRects().length > 0,
+          )
+        : [];
+    getFocusable()[0]?.focus();
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -38,9 +47,7 @@ const DialogPanel: React.FC<DialogPanelProps> = ({
       }
 
       if (event.key !== "Tab" || !panel) return;
-      const focusable = Array.from(
-        panel.querySelectorAll<HTMLElement>(focusableSelector),
-      );
+      const focusable = getFocusable();
       if (focusable.length === 0) return;
 
       const first = focusable[0];
@@ -93,6 +100,7 @@ const DialogPanel: React.FC<DialogPanelProps> = ({
         tabIndex={-1}
         className={`fixed inset-x-3 top-20 z-50 max-h-[calc(100dvh-6rem)] overflow-hidden rounded-2xl border border-white/20 bg-slate-900/95 shadow-2xl shadow-slate-950/30 backdrop-blur-xl animate-slide-up sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:max-h-[calc(100dvh-7rem)] sm:bg-white/10 ${className}`}
         onMouseDown={(event) => event.stopPropagation()}
+        onClick={(event) => event.stopPropagation()}
       >
         {children}
       </div>

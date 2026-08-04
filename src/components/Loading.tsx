@@ -200,7 +200,7 @@ const Loading: React.FC = () => {
             aria-valuemax={100}
             aria-label={`Laden: ${Math.round(progress)} procent`}
           >
-            <div className="flex items-center justify-between text-xs font-medium uppercase tracking-[0.16em] text-white/65">
+            <div className="flex items-center justify-between text-xs font-medium uppercase tracking-[0.16em] text-white/80">
               <span>Progress</span>
               <span className="font-mono text-cyan-200">
                 {Math.round(progress)}%
@@ -260,7 +260,7 @@ const Loading: React.FC = () => {
               Start loading
             </span>
           </button>
-          <p className="text-center text-xs leading-5 text-white/55">
+          <p className="text-center text-xs leading-5 text-white/75">
             Kies een stijl via instellingen en start de demo.
           </p>
         </div>

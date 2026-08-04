@@ -116,15 +116,11 @@ const Dashboard: React.FC = () => {
             >
               Dashboard
             </h2>
-            <p className="mt-1 text-xs text-white/60">
+            <p className="mt-1 text-xs text-white/75">
               Live data uit je loading-sessies
             </p>
           </div>
-          <IconButton
-            label="Sluiten"
-            className="p-1.5 sm:p-2"
-            onClick={closePanel}
-          >
+          <IconButton label="Sluiten" className="sm:p-2" onClick={closePanel}>
             <span className="text-xl leading-none" aria-hidden="true">
               ×
             </span>
@@ -142,7 +138,7 @@ const Dashboard: React.FC = () => {
                   <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/10 text-sm sm:h-10 sm:w-10">
                     {stat.icon}
                   </div>
-                  <span className="text-xs text-white/60">{stat.label}</span>
+                  <span className="text-xs text-white/75">{stat.label}</span>
                 </div>
                 <span className="text-xl font-bold text-white sm:text-2xl">
                   {stat.value}
@@ -156,7 +152,7 @@ const Dashboard: React.FC = () => {
               <span className="text-sm font-medium text-white/80">
                 Recente sessies
               </span>
-              <span className="text-xs text-white/60">{recentRuns} runs</span>
+              <span className="text-xs text-white/75">{recentRuns} runs</span>
             </div>
             <div className="flex h-24 items-end gap-1.5 sm:h-28">
               {chartData.map((value, index) => (
@@ -169,7 +165,7 @@ const Dashboard: React.FC = () => {
                     style={{ height: `${value}%` }}
                     title={`Sessie ${index + 1}`}
                   />
-                  <span className="text-[10px] text-white/50">{index + 1}</span>
+                  <span className="text-[10px] text-white/75">{index + 1}</span>
                 </div>
               ))}
             </div>
