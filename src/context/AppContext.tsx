@@ -10,6 +10,7 @@ import { AppContext, type AppContextType } from "./context";
 import type {
   ActivePanel,
   LoadingMetrics,
+  LoadingState,
   LoadingStyle,
   ToastType,
   Toast as ToastItem,
@@ -20,11 +21,20 @@ interface AppProviderProps {
 }
 
 interface StoredSettings {
+  version?: 1;
   loadingStyle?: LoadingStyle;
   metrics?: LoadingMetrics;
 }
 
 const STORAGE_KEY = "labo3-loading-settings";
+let fallbackToastId = 0;
+const MAX_RECENT_DURATIONS = 12;
+const MAX_DURATION_MS = 24 * 60 * 60 * 1000;
+const DEFAULT_LOADING: LoadingState = {
+  status: "idle",
+  stage: "idle",
+  progress: 0,
+};
 const DEFAULT_METRICS: LoadingMetrics = {
   totalRuns: 0,
   completedRuns: 0,
@@ -40,6 +50,45 @@ const isLoadingStyle = (value: unknown): value is LoadingStyle =>
   value === "spinner" ||
   value === "wave";
 
+const normalizeMetrics = (value: unknown): LoadingMetrics => {
+  if (!value || typeof value !== "object") return DEFAULT_METRICS;
+  const metrics = value as Partial<LoadingMetrics>;
+  const totalRuns =
+    typeof metrics.totalRuns === "number" &&
+    Number.isInteger(metrics.totalRuns) &&
+    metrics.totalRuns >= 0
+      ? metrics.totalRuns
+      : 0;
+  const completedRuns =
+    typeof metrics.completedRuns === "number" &&
+    Number.isInteger(metrics.completedRuns) &&
+    metrics.completedRuns >= 0
+      ? Math.min(metrics.completedRuns, totalRuns)
+      : 0;
+  const totalDurationMs =
+    typeof metrics.totalDurationMs === "number" &&
+    Number.isFinite(metrics.totalDurationMs) &&
+    metrics.totalDurationMs >= 0
+      ? Math.min(
+          metrics.totalDurationMs,
+          MAX_DURATION_MS * MAX_RECENT_DURATIONS,
+        )
+      : 0;
+  const recentDurations = Array.isArray(metrics.recentDurations)
+    ? metrics.recentDurations
+        .filter(
+          (duration): duration is number =>
+            typeof duration === "number" &&
+            Number.isFinite(duration) &&
+            duration >= 0 &&
+            duration <= MAX_DURATION_MS,
+        )
+        .slice(-MAX_RECENT_DURATIONS)
+    : [];
+
+  return { totalRuns, completedRuns, totalDurationMs, recentDurations };
+};
+
 const readStoredSettings = (): StoredSettings => {
   if (typeof window === "undefined") return {};
 
@@ -48,48 +97,15 @@ const readStoredSettings = (): StoredSettings => {
     if (!stored) return {};
     const parsed = JSON.parse(stored) as StoredSettings;
     return {
+      version: parsed.version === 1 ? 1 : undefined,
       loadingStyle: isLoadingStyle(parsed.loadingStyle)
         ? parsed.loadingStyle
         : undefined,
-      metrics: isLoadingMetrics(parsed.metrics) ? parsed.metrics : undefined,
+      metrics: normalizeMetrics(parsed.metrics),
     };
   } catch {
     return {};
   }
-};
-
-const isLoadingMetrics = (value: unknown): value is LoadingMetrics => {
-  if (!value || typeof value !== "object") return false;
-  const metrics = value as Partial<LoadingMetrics>;
-  const totalRuns = metrics.totalRuns;
-  const completedRuns = metrics.completedRuns;
-  const totalDurationMs = metrics.totalDurationMs;
-  const recentDurations = metrics.recentDurations;
-
-  if (
-    typeof totalRuns !== "number" ||
-    typeof completedRuns !== "number" ||
-    typeof totalDurationMs !== "number" ||
-    !Array.isArray(recentDurations)
-  ) {
-    return false;
-  }
-
-  return (
-    Number.isInteger(totalRuns) &&
-    totalRuns >= 0 &&
-    Number.isInteger(completedRuns) &&
-    completedRuns >= 0 &&
-    completedRuns <= totalRuns &&
-    Number.isFinite(totalDurationMs) &&
-    totalDurationMs >= 0 &&
-    recentDurations.every(
-      (duration) =>
-        typeof duration === "number" &&
-        Number.isFinite(duration) &&
-        duration >= 0,
-    )
-  );
 };
 
 export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
@@ -97,13 +113,13 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [loadingStyle, setLoadingStyle] = useState<LoadingStyle>(
     storedSettings.loadingStyle ?? "fidget",
   );
-  const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoadingState] = useState<LoadingState>(DEFAULT_LOADING);
   const [activePanel, setActivePanel] = useState<ActivePanel>(null);
   const [metrics, setMetrics] = useState<LoadingMetrics>(
     storedSettings.metrics ?? DEFAULT_METRICS,
   );
   const [toasts, setToasts] = useState<ToastItem[]>([]);
-  const toastTimers = useRef<number[]>([]);
+  const toastTimers = useRef(new Map<string, number>());
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -111,7 +127,11 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     try {
       window.localStorage.setItem(
         STORAGE_KEY,
-        JSON.stringify({ loadingStyle, metrics } satisfies StoredSettings),
+        JSON.stringify({
+          version: 1,
+          loadingStyle,
+          metrics,
+        } satisfies StoredSettings),
       );
     } catch {
       // Storage can be unavailable in private browsing or restricted iframes.
@@ -119,24 +139,45 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   }, [loadingStyle, metrics]);
 
   useEffect(() => {
+    const activeIds = new Set(toasts.map((toast) => toast.id));
+    toastTimers.current.forEach((timerId, id) => {
+      if (!activeIds.has(id)) {
+        window.clearTimeout(timerId);
+        toastTimers.current.delete(id);
+      }
+    });
+  }, [toasts]);
+
+  useEffect(() => {
+    const timers = toastTimers.current;
     return () => {
-      toastTimers.current.forEach((timerId) => window.clearTimeout(timerId));
-      toastTimers.current = [];
+      timers.forEach((timerId) => window.clearTimeout(timerId));
+      timers.clear();
     };
   }, []);
 
-  const addToast = useCallback((message: string, type: ToastType = "info") => {
-    const id = Date.now() + Math.random();
-    setToasts((prev) => [...prev.slice(-2), { id, message, type }]);
-
-    const timerId = window.setTimeout(() => {
-      setToasts((prev) => prev.filter((toast) => toast.id !== id));
-      toastTimers.current = toastTimers.current.filter(
-        (item) => item !== timerId,
-      );
-    }, 3200);
-    toastTimers.current.push(timerId);
+  const dismissToast = useCallback((id: string) => {
+    const timerId = toastTimers.current.get(id);
+    if (timerId !== undefined) {
+      window.clearTimeout(timerId);
+      toastTimers.current.delete(id);
+    }
+    setToasts((previous) => previous.filter((toast) => toast.id !== id));
   }, []);
+
+  const addToast = useCallback(
+    (message: string, type: ToastType = "info") => {
+      const id =
+        typeof crypto !== "undefined" && "randomUUID" in crypto
+          ? crypto.randomUUID()
+          : `toast-${++fallbackToastId}`;
+      setToasts((previous) => [...previous, { id, message, type }].slice(-3));
+
+      const timerId = window.setTimeout(() => dismissToast(id), 3200);
+      toastTimers.current.set(id, timerId);
+    },
+    [dismissToast],
+  );
 
   const recordLoadingStart = useCallback(() => {
     setMetrics((previous) => ({
@@ -146,11 +187,14 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   }, []);
 
   const recordLoadingComplete = useCallback((durationMs: number) => {
+    const safeDuration = Math.min(Math.max(durationMs, 0), MAX_DURATION_MS);
     setMetrics((previous) => ({
       ...previous,
       completedRuns: previous.completedRuns + 1,
-      totalDurationMs: previous.totalDurationMs + durationMs,
-      recentDurations: [...previous.recentDurations, durationMs].slice(-12),
+      totalDurationMs: previous.totalDurationMs + safeDuration,
+      recentDurations: [...previous.recentDurations, safeDuration].slice(
+        -MAX_RECENT_DURATIONS,
+      ),
     }));
   }, []);
 
@@ -164,12 +208,13 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
   const contextValue: AppContextType = {
     loadingStyle,
-    isLoading,
+    loading,
     activePanel,
     metrics,
     setLoadingStyle,
-    setIsLoading,
+    setLoadingState,
     addToast,
+    dismissToast,
     recordLoadingStart,
     recordLoadingComplete,
     openPanel,
@@ -178,20 +223,14 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
   return (
     <AppContext.Provider value={contextValue}>
-      {children}
-      <div
-        className="pointer-events-none fixed inset-x-4 bottom-4 z-60 flex flex-col items-end gap-2 sm:left-auto sm:right-4 sm:max-w-sm"
-        aria-live="polite"
-        aria-atomic="false"
-      >
+      <div id="app-shell">{children}</div>
+      <div className="pointer-events-none fixed inset-x-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-60 flex flex-col items-end gap-2 sm:left-auto sm:right-4 sm:max-w-sm">
         {toasts.map((toast) => (
           <div className="pointer-events-auto w-full" key={toast.id}>
             <Toast
               message={toast.message}
               type={toast.type}
-              onClose={() =>
-                setToasts((prev) => prev.filter((item) => item.id !== toast.id))
-              }
+              onClose={() => dismissToast(toast.id)}
             />
           </div>
         ))}

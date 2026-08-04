@@ -1,14 +1,17 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import DialogPanel from "./DialogPanel";
 import IconButton from "./IconButton";
+import PanelHeader from "./PanelHeader";
 import { useApp } from "../context/useApp";
 
 interface Message {
-  id: number;
+  id: string;
   text: string;
   sender: "user" | "bot";
   timestamp: Date;
 }
+
+let fallbackMessageId = 0;
 
 const BOT_RESPONSES = [
   "Hoi! Hoe kan ik je helpen? 👋",
@@ -23,12 +26,18 @@ const BOT_RESPONSES = [
   "Geweldig idee! 💡",
 ];
 
+const createMessageId = (): string =>
+  typeof crypto !== "undefined" && "randomUUID" in crypto
+    ? crypto.randomUUID()
+    : `message-${++fallbackMessageId}`;
+
 const Chat: React.FC = () => {
-  const { addToast, activePanel, openPanel, closePanel } = useApp();
+  const { activePanel, openPanel, closePanel } = useApp();
   const isOpen = activePanel === "chat";
+  const isOpenRef = useRef(isOpen);
   const [messages, setMessages] = useState<Message[]>([
     {
-      id: 1,
+      id: "welcome",
       text: "Hoi! Welkom bij de chat. Hoe kan ik je helpen?",
       sender: "bot",
       timestamp: new Date(),
@@ -36,8 +45,22 @@ const Chat: React.FC = () => {
   ]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const messagesEndRef = useRef<HTMLLIElement>(null);
   const responseTimerRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    isOpenRef.current = isOpen;
+  }, [isOpen]);
+
+  useEffect(() => {
+    const reduceMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    messagesEndRef.current?.scrollIntoView({
+      behavior: reduceMotion ? "auto" : "smooth",
+    });
+  }, [messages, isTyping]);
 
   useEffect(() => {
     return () => {
@@ -47,21 +70,13 @@ const Chat: React.FC = () => {
     };
   }, []);
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, isTyping]);
-
   const handleSendMessage = () => {
-    if (!inputValue.trim() || isTyping) return;
-
-    if (responseTimerRef.current !== null) {
-      window.clearTimeout(responseTimerRef.current);
-      responseTimerRef.current = null;
-    }
+    const text = inputValue.trim();
+    if (!text || isTyping) return;
 
     const userMessage: Message = {
-      id: Date.now(),
-      text: inputValue.trim(),
+      id: createMessageId(),
+      text,
       sender: "user",
       timestamp: new Date(),
     };
@@ -73,12 +88,13 @@ const Chat: React.FC = () => {
     responseTimerRef.current = window.setTimeout(
       () => {
         const botResponse: Message = {
-          id: Date.now() + 1,
+          id: createMessageId(),
           text: BOT_RESPONSES[Math.floor(Math.random() * BOT_RESPONSES.length)],
           sender: "bot",
           timestamp: new Date(),
         };
         setMessages((previous) => [...previous, botResponse]);
+        if (!isOpenRef.current) setUnreadCount((count) => count + 1);
         setIsTyping(false);
         responseTimerRef.current = null;
       },
@@ -86,24 +102,23 @@ const Chat: React.FC = () => {
     );
   };
 
-  const handleOpen = () => {
-    if (isOpen) {
-      closePanel();
-      return;
-    }
-
-    openPanel("chat");
-    if (messages.length <= 1) addToast("Chat geopend", "info");
-  };
-
   return (
     <div className="relative">
       <IconButton
-        label={messages.length > 1 ? "Chat, nieuwe berichten" : "Chat"}
+        label={unreadCount ? `Chat, ${unreadCount} nieuwe berichten` : "Chat"}
         active={isOpen}
         aria-expanded={isOpen}
         aria-controls="chat-panel"
-        onClick={handleOpen}
+        onClick={() => {
+          if (isOpen) {
+            isOpenRef.current = false;
+            closePanel();
+          } else {
+            isOpenRef.current = true;
+            setUnreadCount(0);
+            openPanel("chat");
+          }
+        }}
       >
         <svg
           className="h-4 w-4 sm:h-5 sm:w-5"
@@ -119,9 +134,9 @@ const Chat: React.FC = () => {
             d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
           />
         </svg>
-        {messages.length > 1 && !isOpen && (
+        {unreadCount > 0 && !isOpen && (
           <span
-            className="absolute -right-1 -top-1 h-3 w-3 rounded-full bg-fuchsia-400 animate-pulse"
+            className="absolute -right-1 -top-1 h-3 w-3 rounded-full bg-fuchsia-400 motion-safe:animate-pulse"
             aria-hidden="true"
           />
         )}
@@ -134,9 +149,13 @@ const Chat: React.FC = () => {
         onClose={closePanel}
         className="flex h-[min(70dvh,30rem)] flex-col sm:h-96 sm:w-80"
       >
-        <div className="flex shrink-0 items-center justify-between border-b border-white/10 bg-white/10 px-3 py-3 sm:px-4">
-          <div className="flex items-center gap-3">
-            <div className="relative flex h-9 w-9 items-center justify-center rounded-full bg-linear-to-r from-cyan-300 via-violet-400 to-fuchsia-400 sm:h-10 sm:w-10">
+        <PanelHeader
+          title="Chatbot"
+          titleId="chat-title"
+          subtitle="Beschikbaar"
+          onClose={closePanel}
+          leading={
+            <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-linear-to-r from-cyan-300 via-violet-400 to-fuchsia-400 sm:h-10 sm:w-10">
               <svg
                 className="h-4 w-4 text-white sm:h-5 sm:w-5"
                 fill="none"
@@ -153,33 +172,11 @@ const Chat: React.FC = () => {
               </svg>
               <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-slate-900 bg-emerald-400" />
             </div>
-            <div>
-              <h2 id="chat-title" className="text-sm font-semibold text-white">
-                Chat Bot
-              </h2>
-              <p className="text-xs text-white/75">Online</p>
-            </div>
-          </div>
-          <IconButton label="Sluiten" className="sm:p-2" onClick={closePanel}>
-            <svg
-              className="h-4 w-4 sm:h-5 sm:w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              aria-hidden="true"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </IconButton>
-        </div>
+          }
+        />
 
         <ul
-          className="min-h-0 flex-1 space-y-3 overflow-y-auto p-3 sm:space-y-4 sm:p-4"
+          className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain p-3 sm:space-y-4 sm:p-4"
           aria-label="Chatberichten"
         >
           {messages.map((message) => (
@@ -194,19 +191,16 @@ const Chat: React.FC = () => {
                     : "border border-white/10 bg-white/10 text-white"
                 }`}
               >
-                <p className="text-xs sm:text-sm">{message.text}</p>
-                <p
-                  className={`mt-1 text-[11px] ${
-                    message.sender === "user"
-                      ? "text-white/75"
-                      : "text-white/75"
-                  }`}
+                <p className="text-sm">{message.text}</p>
+                <time
+                  className="mt-1 block text-xs text-white/75"
+                  dateTime={message.timestamp.toISOString()}
                 >
                   {message.timestamp.toLocaleTimeString("nl-NL", {
                     hour: "2-digit",
                     minute: "2-digit",
                   })}
-                </p>
+                </time>
               </div>
             </li>
           ))}
@@ -219,7 +213,7 @@ const Chat: React.FC = () => {
                   {[0, 1, 2].map((index) => (
                     <span
                       key={index}
-                      className="h-2 w-2 animate-bounce rounded-full bg-white/60"
+                      className="h-2 w-2 motion-safe:animate-bounce rounded-full bg-white/60"
                       style={{ animationDelay: `${index * 150}ms` }}
                       aria-hidden="true"
                     />
@@ -243,10 +237,10 @@ const Chat: React.FC = () => {
               Bericht invoeren
             </label>
             <input
+              id="chat-message"
               type="text"
               value={inputValue}
               onChange={(event) => setInputValue(event.target.value)}
-              id="chat-message"
               placeholder="Typ een bericht..."
               className="min-w-0 flex-1 rounded-xl border border-white/20 bg-white/10 px-3 py-2 text-base text-white placeholder-white/70 focus:border-cyan-300/50 focus:outline-none focus:ring-2 focus:ring-cyan-300/30 sm:text-sm"
             />
@@ -254,7 +248,7 @@ const Chat: React.FC = () => {
               type="submit"
               disabled={!inputValue.trim() || isTyping}
               className="min-h-11 min-w-11 rounded-xl bg-linear-to-r from-cyan-400 via-violet-500 to-fuchsia-500 p-2 text-white transition hover:from-cyan-300 hover:via-violet-400 hover:to-fuchsia-400 disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/50 active:scale-[0.97]"
-              aria-label="Verstuur bericht"
+              aria-label="Bericht versturen"
             >
               <svg
                 className="h-4 w-4 sm:h-5 sm:w-5"

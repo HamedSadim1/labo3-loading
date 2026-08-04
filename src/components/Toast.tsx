@@ -25,7 +25,8 @@ const Toast: React.FC<ToastProps> = ({ message, type, onClose }) => {
   return (
     <div
       className={`flex w-full items-center gap-3 rounded-xl border px-4 py-3 shadow-2xl shadow-slate-950/30 backdrop-blur-xl animate-slide-up ${typeStyles[type]}`}
-      role="alert"
+      role={type === "error" ? "alert" : "status"}
+      aria-live={type === "error" ? "assertive" : "polite"}
     >
       <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-current/30 text-xs font-bold">
         {icons[type]}

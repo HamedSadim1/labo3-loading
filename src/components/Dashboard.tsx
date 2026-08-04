@@ -2,6 +2,7 @@ import React from "react";
 import AnimatedNumber from "./AnimatedNumber";
 import DialogPanel from "./DialogPanel";
 import IconButton from "./IconButton";
+import PanelHeader from "./PanelHeader";
 import { useApp } from "../context/useApp";
 
 interface StatCard {
@@ -11,7 +12,7 @@ interface StatCard {
 }
 
 const Dashboard: React.FC = () => {
-  const { metrics, activePanel, openPanel, closePanel, addToast } = useApp();
+  const { metrics, activePanel, openPanel, closePanel } = useApp();
   const isOpen = activePanel === "dashboard";
   const averageDuration = metrics.completedRuns
     ? metrics.totalDurationMs / metrics.completedRuns
@@ -25,7 +26,7 @@ const Dashboard: React.FC = () => {
       icon: <span aria-hidden="true">↯</span>,
     },
     {
-      label: "Gem. tijd",
+      label: "Gemiddelde tijd",
       value: metrics.completedRuns ? (
         <AnimatedNumber
           value={averageDuration / 1000}
@@ -58,23 +59,15 @@ const Dashboard: React.FC = () => {
   ];
 
   const chartData = metrics.recentDurations.length
-    ? metrics.recentDurations.map((duration) =>
-        Math.min(
+    ? metrics.recentDurations.map((duration, index) => ({
+        duration,
+        index,
+        height: Math.min(
           100,
           Math.max(12, 100 - (duration / Math.max(1, averageDuration)) * 35),
         ),
-      )
-    : [20, 20, 20, 20, 20, 20];
-
-  const handleOpen = () => {
-    if (isOpen) {
-      closePanel();
-      return;
-    }
-
-    openPanel("dashboard");
-    addToast("Dashboard geopend", "info");
-  };
+      }))
+    : [];
 
   return (
     <div className="relative">
@@ -83,7 +76,7 @@ const Dashboard: React.FC = () => {
         active={isOpen}
         aria-expanded={isOpen}
         aria-controls="dashboard-panel"
-        onClick={handleOpen}
+        onClick={() => (isOpen ? closePanel() : openPanel("dashboard"))}
       >
         <svg
           className="h-4 w-4 sm:h-5 sm:w-5"
@@ -108,27 +101,15 @@ const Dashboard: React.FC = () => {
         onClose={closePanel}
         className="sm:w-120 sm:max-w-[calc(100vw-2rem)]"
       >
-        <div className="flex items-center justify-between border-b border-white/10 bg-white/10 px-4 py-3 sm:px-6 sm:py-4">
-          <div>
-            <h2
-              id="dashboard-title"
-              className="text-base font-semibold text-white sm:text-lg"
-            >
-              Dashboard
-            </h2>
-            <p className="mt-1 text-xs text-white/75">
-              Live data uit je loading-sessies
-            </p>
-          </div>
-          <IconButton label="Sluiten" className="sm:p-2" onClick={closePanel}>
-            <span className="text-xl leading-none" aria-hidden="true">
-              ×
-            </span>
-          </IconButton>
-        </div>
+        <PanelHeader
+          title="Dashboard"
+          titleId="dashboard-title"
+          subtitle="Live gegevens uit je laadsessies"
+          onClose={closePanel}
+        />
 
-        <div className="max-h-[calc(100dvh-10rem)] overflow-y-auto p-3 sm:max-h-[calc(100dvh-12rem)] sm:p-6">
-          <div className="grid grid-cols-2 gap-3 sm:gap-4">
+        <div className="max-h-[calc(100dvh_-_10rem)] overflow-y-auto overscroll-contain p-3 sm:max-h-[calc(100dvh_-_12rem)] sm:p-6">
+          <dl className="grid grid-cols-2 gap-3 sm:gap-4">
             {stats.map((stat) => (
               <div
                 key={stat.label}
@@ -138,38 +119,65 @@ const Dashboard: React.FC = () => {
                   <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/10 text-sm sm:h-10 sm:w-10">
                     {stat.icon}
                   </div>
-                  <span className="text-xs text-white/75">{stat.label}</span>
+                  <dt className="text-sm text-white/80">{stat.label}</dt>
                 </div>
-                <span className="text-xl font-bold text-white sm:text-2xl">
+                <dd className="text-xl font-bold text-white sm:text-2xl">
                   {stat.value}
-                </span>
+                </dd>
               </div>
             ))}
-          </div>
+          </dl>
 
-          <div className="mt-4 rounded-xl border border-white/10 bg-white/5 p-3 sm:mt-6 sm:p-4">
+          <figure className="mt-4 rounded-xl border border-white/10 bg-white/5 p-3 sm:mt-6 sm:p-4">
             <div className="mb-4 flex items-center justify-between">
-              <span className="text-sm font-medium text-white/80">
+              <figcaption className="text-sm font-medium text-white/85">
                 Recente sessies
-              </span>
-              <span className="text-xs text-white/75">{recentRuns} runs</span>
+              </figcaption>
+              <span className="text-sm text-white/75">{recentRuns} runs</span>
             </div>
-            <div className="flex h-24 items-end gap-1.5 sm:h-28">
-              {chartData.map((value, index) => (
+            {chartData.length ? (
+              <>
                 <div
-                  key={`${value}-${index}`}
-                  className="flex h-full flex-1 flex-col items-center justify-end gap-1"
+                  className="flex h-24 items-end gap-1.5 sm:h-28"
+                  aria-hidden="true"
                 >
-                  <div
-                    className="w-full rounded-t bg-linear-to-t from-cyan-500 to-violet-400 transition hover:from-cyan-300 hover:to-violet-300"
-                    style={{ height: `${value}%` }}
-                    title={`Sessie ${index + 1}`}
-                  />
-                  <span className="text-[10px] text-white/75">{index + 1}</span>
+                  {chartData.map(({ height, index }) => (
+                    <div
+                      key={`${index}-${height}`}
+                      className="flex h-full flex-1 flex-col items-center justify-end gap-1"
+                    >
+                      <div
+                        className="w-full rounded-t bg-linear-to-t from-cyan-500 to-violet-400 transition hover:from-cyan-300 hover:to-violet-300"
+                        style={{ height: `${height}%` }}
+                      />
+                      <span className="text-xs text-white/75">{index + 1}</span>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
+                <table className="sr-only">
+                  <caption>Laadtijd per recente sessie</caption>
+                  <thead>
+                    <tr>
+                      <th scope="col">Sessie</th>
+                      <th scope="col">Duur</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {chartData.map(({ duration, index }) => (
+                      <tr key={`table-${index}`}>
+                        <th scope="row">{index + 1}</th>
+                        <td>{(duration / 1000).toFixed(1)} seconden</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </>
+            ) : (
+              <p className="text-sm text-white/75">
+                Nog geen sessies geregistreerd.
+              </p>
+            )}
+          </figure>
         </div>
       </DialogPanel>
     </div>

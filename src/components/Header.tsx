@@ -1,13 +1,21 @@
 import React from "react";
+import { useApp } from "../context/useApp";
 import { APP_TITLE } from "../constants/app";
 
 const Header: React.FC = () => {
+  const { loading } = useApp();
+  const statusLabel = loading.status === "running" ? "Bezig" : "Klaar";
+  const statusClass =
+    loading.status === "running" ? "bg-amber-300" : "bg-cyan-300";
+
   return (
     <header className="mb-8 animate-slide-up sm:mb-10">
       <div className="mb-5 flex items-center justify-between text-left">
-        <div className="inline-flex items-center gap-2 rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-cyan-200">
-          <span className="h-1.5 w-1.5 rounded-full bg-cyan-300 shadow-[0_0_10px_rgba(103,232,249,0.9)]" />
-          Ready
+        <div className="inline-flex items-center gap-2 rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-cyan-200">
+          <span
+            className={`h-1.5 w-1.5 rounded-full ${statusClass} shadow-[0_0_10px_rgba(103,232,249,0.9)]`}
+          />
+          <span role="status">{statusLabel}</span>
         </div>
         <span className="text-xs font-medium uppercase tracking-[0.18em] text-white/75">
           v3.0

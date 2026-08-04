@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 
 interface DialogPanelProps {
   id: string;
@@ -23,10 +24,18 @@ const DialogPanel: React.FC<DialogPanelProps> = ({
   useEffect(() => {
     if (!open) return;
 
+    const appShell = document.getElementById("app-shell");
+    const previousAriaHidden = appShell?.getAttribute("aria-hidden") ?? null;
+    const previousInert = appShell?.inert ?? false;
     previousFocusRef.current = document.activeElement as HTMLElement | null;
+    if (appShell) {
+      appShell.setAttribute("aria-hidden", "true");
+      appShell.inert = true;
+    }
+
     const panel = panelRef.current;
     const focusableSelector =
-      'button:not([disabled]):not([aria-hidden="true"]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [href], [contenteditable="true"], [tabindex]:not([tabindex="-1"])';
+      'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [href], [contenteditable="true"], [tabindex]:not([tabindex="-1"])';
     const getFocusable = () =>
       panel
         ? Array.from(
@@ -37,6 +46,7 @@ const DialogPanel: React.FC<DialogPanelProps> = ({
               element.getClientRects().length > 0,
           )
         : [];
+
     getFocusable()[0]?.focus();
 
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -48,7 +58,11 @@ const DialogPanel: React.FC<DialogPanelProps> = ({
 
       if (event.key !== "Tab" || !panel) return;
       const focusable = getFocusable();
-      if (focusable.length === 0) return;
+      if (focusable.length === 0) {
+        event.preventDefault();
+        panel.focus();
+        return;
+      }
 
       const first = focusable[0];
       const last = focusable[focusable.length - 1];
@@ -67,6 +81,12 @@ const DialogPanel: React.FC<DialogPanelProps> = ({
     document.addEventListener("keydown", handleKeyDown);
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
+      if (appShell) {
+        if (previousAriaHidden === null)
+          appShell.removeAttribute("aria-hidden");
+        else appShell.setAttribute("aria-hidden", previousAriaHidden);
+        appShell.inert = previousInert;
+      }
       window.requestAnimationFrame(() => {
         const nextDialog = document.querySelector('[role="dialog"]');
         const previousFocus = previousFocusRef.current;
@@ -82,12 +102,12 @@ const DialogPanel: React.FC<DialogPanelProps> = ({
     };
   }, [onClose, open]);
 
-  if (!open) return null;
+  if (!open || typeof document === "undefined") return null;
 
-  return (
+  return createPortal(
     <>
       <div
-        className="fixed inset-0 z-40 bg-slate-950/45 backdrop-blur-[2px]"
+        className="fixed inset-0 z-[90] bg-slate-950/55 backdrop-blur-[2px]"
         onMouseDown={onClose}
         aria-hidden="true"
       />
@@ -98,13 +118,14 @@ const DialogPanel: React.FC<DialogPanelProps> = ({
         aria-modal="true"
         aria-labelledby={titleId}
         tabIndex={-1}
-        className={`fixed inset-x-3 top-20 z-50 max-h-[calc(100dvh-6rem)] overflow-hidden rounded-2xl border border-white/20 bg-slate-900/95 shadow-2xl shadow-slate-950/30 backdrop-blur-xl animate-slide-up sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:max-h-[calc(100dvh-7rem)] sm:bg-white/10 ${className}`}
+        className={`fixed inset-x-3 top-[max(4.5rem,env(safe-area-inset-top))] z-[100] flex max-h-[calc(100dvh_-_6rem_-_env(safe-area-inset-bottom))] flex-col overflow-hidden overscroll-contain rounded-2xl border border-white/20 bg-slate-900/95 shadow-2xl shadow-slate-950/30 backdrop-blur-xl motion-safe:animate-slide-up sm:inset-x-auto sm:right-4 sm:top-[calc(4.5rem_+_env(safe-area-inset-top))] sm:mt-2 sm:max-h-[calc(100dvh_-_7rem_-_env(safe-area-inset-bottom))] sm:bg-white/10 ${className}`}
         onMouseDown={(event) => event.stopPropagation()}
         onClick={(event) => event.stopPropagation()}
       >
         {children}
       </div>
-    </>
+    </>,
+    document.body,
   );
 };
 

@@ -2,18 +2,20 @@ import { createContext } from "react";
 import type {
   ActivePanel,
   LoadingMetrics,
+  LoadingState,
   LoadingStyle,
   ToastType,
 } from "./types";
 
 export interface AppContextType {
   loadingStyle: LoadingStyle;
-  isLoading: boolean;
+  loading: LoadingState;
   activePanel: ActivePanel;
   metrics: LoadingMetrics;
   setLoadingStyle: (style: LoadingStyle) => void;
-  setIsLoading: (loading: boolean) => void;
+  setLoadingState: (state: LoadingState) => void;
   addToast: (message: string, type?: ToastType) => void;
+  dismissToast: (id: string) => void;
   recordLoadingStart: () => void;
   recordLoadingComplete: (durationMs: number) => void;
   openPanel: (panel: Exclude<ActivePanel, null>) => void;

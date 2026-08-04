@@ -6,7 +6,7 @@ interface BackgroundProps {
 
 const Background: React.FC<BackgroundProps> = ({ children }) => {
   return (
-    <div className="relative min-h-screen overflow-x-hidden bg-slate-950 text-white selection:bg-cyan-300/30 selection:text-white">
+    <div className="relative min-h-dvh w-full max-w-full overflow-clip bg-slate-950 text-white selection:bg-cyan-300/30 selection:text-white">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(14,165,233,0.18),transparent_35%),radial-gradient(circle_at_80%_20%,rgba(168,85,247,0.16),transparent_32%),linear-gradient(135deg,#0f172a_0%,#1e1b4b_52%,#111827_100%)]" />
       <div className="pointer-events-none absolute inset-0 bg-linear-to-br from-cyan-400/5 via-transparent to-fuchsia-400/10 animate-gradient bg-size-[180%_180%]" />
 
