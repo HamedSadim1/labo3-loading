@@ -1,5 +1,7 @@
 import React, { useState, useCallback } from "react";
 import { delay } from "../utils/delay";
+import { useApp } from "../context/AppContext";
+import { LoadingStyleDisplay } from "./LoadingStyles";
 
 type LoadingStage =
   "idle" | "initializing" | "processing" | "finalizing" | "complete";
@@ -82,7 +84,8 @@ const STAGES: StageConfig[] = [
 
 const TOTAL_DURATION = STAGES.reduce((sum, s) => sum + s.duration, 0);
 
-const Loading = () => {
+const Loading: React.FC = () => {
+  const { loadingStyle, addToast } = useApp();
   const [loading, setLoading] = useState<boolean>(false);
   const [stage, setStage] = useState<LoadingStage>("idle");
   const [progress, setProgress] = useState<number>(0);
@@ -90,6 +93,7 @@ const Loading = () => {
   const handleLoading = useCallback(async () => {
     setLoading(true);
     setProgress(0);
+    addToast("Loading gestart...", "info");
 
     let elapsed = 0;
     for (let i = 0; i < STAGES.length; i++) {
@@ -113,41 +117,47 @@ const Loading = () => {
 
     setProgress(100);
     setStage("complete");
+    addToast("Loading voltooid!", "success");
     await delay(1500);
 
     setLoading(false);
     setStage("idle");
     setProgress(0);
-  }, []);
+  }, [addToast]);
 
   const currentStageConfig = STAGES.find((s) => s.stageKey === stage);
 
   return (
-    <div className="flex flex-col items-center space-y-6 animate-slide-up [animation-delay:0.2s]">
+    <div className="flex flex-col items-center space-y-4 sm:space-y-6 animate-slide-up [animation-delay:0.2s]">
       {loading ? (
         <div
-          className="w-full space-y-6"
+          className="w-full space-y-4 sm:space-y-6"
           role="progressbar"
           aria-valuenow={progress}
           aria-valuemin={0}
           aria-valuemax={100}
           aria-label={`Laden: ${Math.round(progress)}%`}
         >
+          {/* Loading Style Display */}
+          <LoadingStyleDisplay style={loadingStyle} isActive={loading} />
+
           {/* Progress bar */}
-          <div className="relative h-2 bg-white/10 rounded-full overflow-hidden backdrop-blur-sm border border-white/10">
-            <div
-              className="absolute inset-y-0 left-0 bg-linear-to-r from-blue-400 via-purple-400 to-pink-400 rounded-full transition-all duration-200 ease-out"
-              style={{ width: `${progress}%` }}
-            />
-            <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/30 to-transparent animate-gradient bg-[length:200%_100%]" />
-          </div>
+          {loadingStyle === "bar" ? null : (
+            <div className="relative h-2 bg-white/10 rounded-full overflow-hidden backdrop-blur-sm border border-white/10">
+              <div
+                className="absolute inset-y-0 left-0 bg-linear-to-r from-blue-400 via-purple-400 to-pink-400 rounded-full transition-all duration-200 ease-out"
+                style={{ width: `${progress}%` }}
+              />
+              <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/30 to-transparent animate-gradient bg-[length:200%_100%]" />
+            </div>
+          )}
 
           {/* Stage info */}
-          <div className="flex items-center justify-center gap-3 text-white/90">
+          <div className="flex items-center justify-center gap-2 sm:gap-3 text-white/90">
             <div className="animate-spin-slow text-purple-300">
               {currentStageConfig?.icon}
             </div>
-            <span className="text-sm font-medium tracking-wide">
+            <span className="text-xs sm:text-sm font-medium tracking-wide">
               {currentStageConfig?.label}
             </span>
             <span className="text-xs text-white/50 font-mono">
@@ -158,9 +168,9 @@ const Loading = () => {
           {/* Completion state */}
           {stage === "complete" && (
             <div className="text-center animate-fade-in">
-              <div className="inline-flex items-center gap-2 text-emerald-300 bg-emerald-500/10 px-4 py-2 rounded-full border border-emerald-500/20">
+              <div className="inline-flex items-center gap-2 text-emerald-300 bg-emerald-500/10 px-3 sm:px-4 py-2 rounded-full border border-emerald-500/20">
                 <svg
-                  className="w-5 h-5"
+                  className="w-4 h-4 sm:w-5 sm:h-5"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -172,7 +182,9 @@ const Loading = () => {
                     d="M5 13l4 4L19 7"
                   />
                 </svg>
-                <span className="text-sm font-medium">Voltooid!</span>
+                <span className="text-xs sm:text-sm font-medium">
+                  Voltooid!
+                </span>
               </div>
             </div>
           )}
@@ -180,7 +192,7 @@ const Loading = () => {
       ) : (
         <button
           onClick={handleLoading}
-          className="group relative px-8 py-4 text-white font-semibold rounded-2xl overflow-hidden transition-all duration-300 hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-white/20"
+          className="group relative px-6 sm:px-8 py-3 sm:py-4 text-white font-semibold rounded-2xl overflow-hidden transition-all duration-300 hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-white/20"
           aria-label="Start loading procedure"
         >
           {/* Button background */}
@@ -191,9 +203,9 @@ const Loading = () => {
           <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
 
           {/* Button content */}
-          <span className="relative z-10 flex items-center gap-3">
+          <span className="relative z-10 flex items-center gap-2 sm:gap-3">
             <svg
-              className="w-5 h-5 transition-transform duration-300 group-hover:rotate-12"
+              className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 group-hover:rotate-12"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"

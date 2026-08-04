@@ -1,1 +1,1 @@
-export const APP_TITLE = "Freebuff Loading";
+export const APP_TITLE = "Labo 3 - Loading";
