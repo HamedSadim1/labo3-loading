@@ -13,6 +13,8 @@
   "devDependencies": {
     "@commitlint/cli": "^21.2.1",
     "@commitlint/config-conventional": "^21.2.0",
+    "@commitlint/cz-commitlint": "^21.2.0",
+    "@cspell/dict-nl-nl": "^2.4.2",
     "@eslint/js": "^10.0.1",
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/git": "^10.0.1",
@@ -20,11 +22,14 @@
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
     "@vitejs/plugin-react": "^6.0.5",
+    "commitizen": "^4.3.2",
+    "cspell": "^10.0.1",
     "eslint": "^10.8.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.3",
     "husky": "^9.1.7",
+    "knip": "^6.31.0",
     "lint-staged": "^17.3.0",
     "prettier": "^3.9.6",
     "semantic-release": "^25.0.8",
@@ -41,8 +46,16 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit",
+    "spellcheck": "cspell lint \"**\" --no-progress --no-summary",
+    "knip": "knip",
+    "commit": "cz",
     "prepare": "husky",
     "release": "semantic-release"
+  },
+  "config": {
+    "commitizen": {
+      "path": "@commitlint/cz-commitlint"
+    }
   },
   "commitlint": {
     "extends": [
